@@ -12,7 +12,7 @@ struct Triad {
 /// Parses a triad from a BUFR message.
 ///
 /// A Triad has 3 fields:
-/// - f (2 bits): 
+/// - f (2 bits):
 /// - x (2 bits):
 /// - y (8 bits):
 fn parse_triad(buf: [u8; 2]) -> Triad {
@@ -24,18 +24,17 @@ fn parse_triad(buf: [u8; 2]) -> Triad {
 }
 
 impl Triad {
-  fn encode_triad(&self) -> [u8; 2] {
-      let mut buf = [0u8; 2]; 
-      buf[0] = (self.f << 6) + self.x;
-      buf[1] = self.y;
-      buf
-  }
+    fn encode_triad(&self) -> [u8; 2] {
+        let mut buf = [0u8; 2];
+        buf[0] = (self.f << 6) + self.x;
+        buf[1] = self.y;
+        buf
+    }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{parse_triad};
-
+    use super::parse_triad;
 
     #[test]
     fn encode_triad_1() {
