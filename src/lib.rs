@@ -2,6 +2,34 @@
 
 //! Module level docs
 
+/// Possible errors when parsing BUFR messages
+#[derive(Debug, thiserror::Error)]
+pub enum Error {
+    /// Message too short to even contain the total size
+    #[error("BUFR message is too short, less than 8 bytes")]
+    MessageTooShort,
+
+    /// Message shorter than specified on section 0
+    #[error("Message shorter than expected, is it truncated?")]
+    TruncatedMessage,
+}
+
+/// A parsed BUFR message
+pub struct Message;
+
+/// Decode a BUFR message
+pub fn decode(buf: &[u8]) -> Result<Message, Error> {
+    // section 0
+    if buf.len() < 8 {
+        return Err(Error::MessageTooShort);
+    }
+
+    // TODO: verify BUFR start [0x42 0x55 0x46 0x52]
+    // TODO: total length [0x0 0x0 0x92]
+    // TODO: version [0x04]
+    Ok(Message {})
+}
+
 /// Struct for a descriptor
 struct Descriptor {
     f: u8,
