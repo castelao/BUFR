@@ -16,6 +16,8 @@ fn simple_parse() -> Result<(), Box<dyn std::error::Error>> {
     let message = bufr::decode(&buffer)?;
     // TODO: check message values
 
+    assert_eq!(message.total_length(), 146);
+    assert_eq!(message.version(), 4);
     Ok(())
 }
 
@@ -28,4 +30,31 @@ fn too_short() {
             _ => assert!(false),
         };
     }
+}
+
+#[test]
+fn bad_magic() {
+    let buf = [0; 8];
+    match bufr::decode(&buf) {
+        Err(bufr::Error::MagicNumber) => (),
+        _ => assert!(false),
+    };
+}
+
+#[test]
+fn wrong_message_size() {
+    let buf = [b'B', b'U', b'F', b'R', 0, 0, 9, 4];
+    match bufr::decode(&buf) {
+        Err(bufr::Error::TruncatedMessage) => (),
+        _ => assert!(false),
+    };
+}
+
+#[test]
+fn version_not_supported() {
+    let buf = [b'B', b'U', b'F', b'R', 0, 0, 8, 2];
+    match bufr::decode(&buf) {
+        Err(bufr::Error::VersionNotSupported(2)) => (),
+        _ => assert!(false),
+    };
 }
