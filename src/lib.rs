@@ -1,6 +1,8 @@
-#![deny(missing_docs)]
+//#![deny(missing_docs)]
 
 //! Module level docs
+
+use getset::{CopyGetters, Getters};
 
 /// Possible errors when parsing BUFR messages
 #[derive(Debug, thiserror::Error)]
@@ -25,7 +27,186 @@ pub enum Error {
 /// A parsed BUFR message
 pub struct Message {
     total_length: u32,
-    version: u8
+    version: u8,
+    section1: Section1,
+}
+
+/// Identification Section (section 1) of the BUFR format
+pub enum Section1 {
+    /// Version 3 for the section 1
+    V3(Section1v3),
+    /// Version 4 for the section 1
+    V4(Section1v4),
+}
+
+impl Section1 {
+    fn decode(buf: &[u8], version: u8) -> Result<Section1, Error> {
+        Ok(match version {
+            3 => Section1::V3(Section1v3::decode(&buf[..])?),
+            4 => Section1::V4(Section1v4::decode(&buf[..])?),
+            _ => unimplemented!(),
+        })
+    }
+
+    /// Length of the Section 1
+    pub fn length(&self) -> usize {
+        match self {
+            Section1::V3(v) => v.length(),
+            Section1::V4(v) => v.length(),
+        }
+    }
+}
+
+/// Version 3 variant of the Section 1
+#[derive(CopyGetters, Getters)]
+pub struct Section1v3 {
+    length: usize,
+    master_table: u8,
+    #[getset(get_copy = "pub")]
+    sub_center: u8,
+    #[getset(get_copy = "pub")]
+    center: u8,
+    #[getset(get_copy = "pub")]
+    update_version: u8,
+    #[getset(get_copy = "pub")]
+    optional_section: bool,
+    #[getset(get_copy = "pub")]
+    data_category: u8,
+    #[getset(get_copy = "pub")]
+    data_subcategory: u8,
+    // In the future change to a table object
+    #[getset(get_copy = "pub")]
+    master_table_version: u8,
+    #[getset(get_copy = "pub")]
+    local_table_version: u8,
+    #[getset(get_copy = "pub")]
+    year: u8,
+    #[getset(get_copy = "pub")]
+    month: u8,
+    #[getset(get_copy = "pub")]
+    day: u8,
+    #[getset(get_copy = "pub")]
+    hour: u8,
+    #[getset(get_copy = "pub")]
+    minute: u8,
+    #[getset(get = "pub")]
+    local_use: Vec<u8>,
+}
+
+impl Section1v3 {
+    fn decode(buf: &[u8]) -> Result<Section1v3, Error> {
+        unimplemented!()
+    }
+
+    /// Length of the Section 1
+    pub fn length(&self) -> usize {
+        self.length
+    }
+
+    /// Master table for this section
+    pub fn master_table(&self) -> u8 {
+        self.master_table
+    }
+}
+
+/// Version 4 variant of the Section 1
+#[allow(missing_docs)]
+#[derive(CopyGetters, Getters)]
+pub struct Section1v4 {
+    length: usize,
+    #[getset(get_copy = "pub")]
+    master_table: u8,
+    #[getset(get_copy = "pub")]
+    sub_center: u16,
+    #[getset(get_copy = "pub")]
+    center: u16,
+    #[getset(get_copy = "pub")]
+    update_version: u8,
+    #[getset(get_copy = "pub")]
+    optional_section: bool,
+    #[getset(get_copy = "pub")]
+    data_category: u8,
+    #[getset(get_copy = "pub")]
+    data_subcategory: u8,
+    #[getset(get_copy = "pub")]
+    local_subcategory: u8,
+    // In the future change to a table object
+    #[getset(get_copy = "pub")]
+    master_table_version: u8,
+    #[getset(get_copy = "pub")]
+    local_table_version: u8,
+    #[getset(get_copy = "pub")]
+    year: u16,
+    #[getset(get_copy = "pub")]
+    month: u8,
+    #[getset(get_copy = "pub")]
+    day: u8,
+    #[getset(get_copy = "pub")]
+    hour: u8,
+    #[getset(get_copy = "pub")]
+    minute: u8,
+    #[getset(get_copy = "pub")]
+    second: u8,
+    #[getset(get = "pub")]
+    local_use: Vec<u8>,
+}
+
+impl Section1v4 {
+    fn decode(buf: &[u8]) -> Result<Section1v4, Error> {
+        let length = (usize::from(buf[0]) << 16) + (usize::from(buf[1]) << 8) + usize::from(buf[2]);
+        let master_table: u8 = buf[3];
+        let center: u16 = (u16::from(buf[4]) << 8) + (buf[5] as u16);
+        let sub_center: u16 = (u16::from(buf[6]) << 8) + u16::from(buf[7]);
+        let update_version: u8 = buf[8];
+        let optional_section: bool = match buf[9] {
+            64 => true,
+            0 => false,
+            _ => todo!("error"),
+        };
+        let data_category: u8 = buf[10];
+        let data_subcategory: u8 = buf[11];
+        let local_subcategory: u8 = buf[12];
+        // In the future change to a table object
+        let master_table_version: u8 = buf[13];
+        let local_table_version: u8 = buf[14];
+        let year: u16 = (u16::from(buf[15]) << 8) + u16::from(buf[16]);
+        let month: u8 = buf[17];
+        let day: u8 = buf[18];
+        let hour: u8 = buf[19];
+        let minute: u8 = buf[20];
+        let second: u8 = buf[21];
+        let local_use = if length > 21 {
+            buf[22..length].into()
+        } else {
+            vec![]
+        };
+
+        Ok(Section1v4 {
+            length,
+            master_table,
+            sub_center,
+            center,
+            update_version,
+            optional_section,
+            data_category,
+            data_subcategory,
+            local_subcategory,
+            master_table_version,
+            local_table_version,
+            year,
+            month,
+            day,
+            hour,
+            minute,
+            second,
+            local_use,
+        })
+    }
+
+    /// Length of the Section 1
+    pub fn length(&self) -> usize {
+        self.length
+    }
 }
 
 impl Message {
@@ -37,6 +218,11 @@ impl Message {
     /// BUFR protocol version
     pub fn version(&self) -> u8 {
         self.version
+    }
+
+    /// Section 1 of the Message
+    pub fn section1(&self) -> &Section1 {
+        &self.section1
     }
 }
 
@@ -52,18 +238,31 @@ pub fn decode(buf: &[u8]) -> Result<Message, Error> {
         return Err(Error::MagicNumber);
     }
     // TODO: total length [0x0 0x0 0x92]
-    let total_length: u32 = (u32::from(buf[4]) << 16) + (u32::from(buf[5]) << 8) + u32::from(buf[6]);
+    let total_length: u32 =
+        (u32::from(buf[4]) << 16) + (u32::from(buf[5]) << 8) + u32::from(buf[6]);
 
     if (buf.len() as u32) < total_length {
-        return Err(Error::TruncatedMessage)
+        return Err(Error::TruncatedMessage);
     }
     // TODO: version [0x04]
     let version: u8 = buf[7];
     match version {
         3 | 4 => (),
-        v => return Err(Error::VersionNotSupported(v))
+        v => return Err(Error::VersionNotSupported(v)),
     };
-    Ok(Message {total_length, version})
+
+    let mut offset: usize = 8;
+
+    let section1 = Section1::decode(&buf[offset..], version)?;
+    offset += section1.length();
+
+    //Section2::decode(&buf[offset..]) -> n_consumed
+
+    Ok(Message {
+        total_length,
+        version,
+        section1,
+    })
 }
 
 /// Struct for a descriptor

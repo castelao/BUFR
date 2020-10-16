@@ -18,6 +18,33 @@ fn simple_parse() -> Result<(), Box<dyn std::error::Error>> {
 
     assert_eq!(message.total_length(), 146);
     assert_eq!(message.version(), 4);
+
+    let section1 = message.section1();
+    assert_eq!(section1.length(), 22);
+    match section1 {
+        bufr::Section1::V3(data) => {
+            assert_eq!(data.master_table(), 8);
+        }
+        bufr::Section1::V4(data) => {
+            assert_eq!(data.master_table(), 0);
+            assert_eq!(data.center(), 34);
+            assert_eq!(data.sub_center(), 0);
+            assert_eq!(data.update_version(), 0);
+            assert_eq!(data.optional_section(), false);
+            assert_eq!(data.data_category(), 12);
+            assert_eq!(data.data_subcategory(), 7);
+            assert_eq!(data.local_subcategory(), 255);
+            assert_eq!(data.master_table_version(), 12);
+            assert_eq!(data.local_table_version(), 255);
+            assert_eq!(data.year(), 2004);
+            assert_eq!(data.month(), 6);
+            assert_eq!(data.day(), 16);
+            assert_eq!(data.hour(), 0);
+            assert_eq!(data.minute(), 0);
+            assert_eq!(data.second(), 0);
+            assert_eq!(data.local_use(), &[]);
+        }
+    }
     Ok(())
 }
 
