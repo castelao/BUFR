@@ -39,6 +39,7 @@ pub struct Message {
     total_length: u32,
     version: u8,
     section1: Section1,
+    section3: Section3,
 }
 
 /// Identification Section (section 1) of the BUFR format
@@ -271,7 +272,12 @@ impl Section3 {
             descriptors.push(descriptor);
         }
 
-        unimplemented!();
+        Ok(Section3 {
+            length,
+            is_observed,
+            is_compressed,
+            descriptors,
+        })
     }
 }
 
@@ -327,10 +333,14 @@ pub fn decode(buf: &[u8]) -> Result<Message, Error> {
         unimplemented!()
     }
 
+    let section3 = Section3::decode(&buf[offset..], version)?;
+    offset += section3.length();
+
     Ok(Message {
         total_length,
         version,
         section1,
+        section3,
     })
 }
 
