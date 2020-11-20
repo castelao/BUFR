@@ -2,6 +2,8 @@
 
 //! Module level docs
 
+use std::convert::TryInto;
+
 use getset::{CopyGetters, Getters};
 
 /// Possible errors when parsing BUFR messages
@@ -22,6 +24,14 @@ pub enum Error {
     /// BUFR version not supported
     #[error("BUFR version {0} not supported")]
     VersionNotSupported(u8),
+
+    /// Number of descriptors doesn't match the size
+    #[error("Expected {n_descriptors} descriptors, requiring {descriptor_size}B but buffer size {buffer_size}B")]
+    WrongNumberOfDescriptors {
+        n_descriptors: u16,
+        descriptor_size: usize,
+        buffer_size: usize,
+    },
 }
 
 /// A parsed BUFR message
@@ -53,6 +63,14 @@ impl Section1 {
         match self {
             Section1::V3(v) => v.length(),
             Section1::V4(v) => v.length(),
+        }
+    }
+
+    /// Optional section 2 switch
+    pub fn optional_section(&self) -> bool {
+        match self {
+            Section1::V3(v) => v.optional_section(),
+            Section1::V4(v) => v.optional_section(),
         }
     }
 }
@@ -155,7 +173,7 @@ impl Section1v4 {
     fn decode(buf: &[u8]) -> Result<Section1v4, Error> {
         let length = (usize::from(buf[0]) << 16) + (usize::from(buf[1]) << 8) + usize::from(buf[2]);
         let master_table: u8 = buf[3];
-        let center: u16 = (u16::from(buf[4]) << 8) + (buf[5] as u16);
+        let center: u16 = (u16::from(buf[4]) << 8) + u16::from(buf[5]);
         let sub_center: u16 = (u16::from(buf[6]) << 8) + u16::from(buf[7]);
         let update_version: u8 = buf[8];
         let optional_section: bool = match buf[9] {
@@ -209,6 +227,54 @@ impl Section1v4 {
     }
 }
 
+/// Data description Section (section 3) of the BUFR format
+pub struct Section3 {
+    length: usize,
+    // 4th byte is reserved
+    is_observed: bool,
+    is_compressed: bool,
+    descriptors: Vec<Descriptor>,
+}
+
+impl Section3 {
+    fn decode(buf: &[u8]) -> Result<Section3, Error> {
+        if buf.len() < 8 {
+            return Err(Error::MessageTooShort);
+        }
+        let length = (usize::from(buf[0]) << 16) + (usize::from(buf[1]) << 8) + usize::from(buf[2]);
+        if (buf.len() as usize) < length {
+            return Err(Error::TruncatedMessage);
+        }
+        // 4th byte reserved, set to zero
+        assert_eq!(buf[3], 0);
+        // number of descriptors
+        let n_subsets = (u16::from(buf[4]) << 8) + u16::from(buf[5]);
+        if length != 7 + 2 * usize::from(n_subsets) {
+            return Err(Error::WrongNumberOfDescriptors {
+                n_descriptors: n_subsets,
+                descriptor_size: usize::from(n_subsets * 2),
+                buffer_size: length,
+            });
+        };
+
+        let (is_observed, is_compressed) = match buf[6] {
+            0 => (false, false),
+            0b01_000000 => (false, true),
+            0b10_000000 => (true, false),
+            0b11_000000 => (true, true),
+            _ => todo!("error"),
+        };
+
+        let mut descriptors = vec![];
+        for chunk in buf[8..length].chunks(2) {
+            let descriptor = parse_descriptor(chunk.try_into().unwrap());
+            descriptors.push(descriptor);
+        }
+
+        unimplemented!();
+    }
+}
+
 impl Message {
     /// Total length of the message including all sections
     pub fn total_length(&self) -> u32 {
@@ -256,7 +322,10 @@ pub fn decode(buf: &[u8]) -> Result<Message, Error> {
     let section1 = Section1::decode(&buf[offset..], version)?;
     offset += section1.length();
 
-    //Section2::decode(&buf[offset..]) -> n_consumed
+    if section1.optional_section() {
+        //Section2::decode(&buf[offset..]) -> n_consumed
+        unimplemented!()
+    }
 
     Ok(Message {
         total_length,
@@ -279,7 +348,7 @@ struct Descriptor {
 /// - x (2 bits):
 /// - y (8 bits):
 fn parse_descriptor(buf: [u8; 2]) -> Descriptor {
-    let f = (buf[0] & 0b11000000) >> 6;
+    let f = buf[0] & 0b11000000;
     let x = buf[0] & 0b00111111;
     let y = buf[1];
 
