@@ -45,6 +45,79 @@ fn simple_parse() -> Result<(), Box<dyn std::error::Error>> {
             assert_eq!(data.local_use(), &[]);
         }
     }
+
+    let section3 = message.section3();
+    assert_eq!(section3.length(), 67);
+
+    let descriptors = section3.descriptors();
+    assert_eq!(descriptors.len(), 30);
+    //3 1 1
+    assert_eq!(descriptors[0].encode(), [0b11_000001, 1]);
+    //3 1 11
+    assert_eq!(descriptors[1].encode(), [0b11_000001, 11]);
+    //3 1 12
+    assert_eq!(descriptors[2].encode(), [0b11_000001, 12]);
+    //0 1 7
+    assert_eq!(descriptors[3].encode(), [0b00_000001, 7]);
+    //0 1 33
+    assert_eq!(descriptors[4].encode(), [0b00_000001, 33]);
+    //0 25 150
+    assert_eq!(descriptors[5].encode(), [0b00_011001, 150]);
+    //1 22 0
+    assert_eq!(descriptors[6].encode(), [0b01_010110, 0]);
+    //0 31 1
+    assert_eq!(descriptors[7].encode(), [0b00_011111, 1]);
+    //0 1 27
+    assert_eq!(descriptors[8].encode(), [0b00_000001, 27]);
+    //0 19 150
+    assert_eq!(descriptors[9].encode(), [0b00_010011, 150]);
+    //1 19 106
+    assert_eq!(descriptors[10].encode(), [0b00_010011, 106]);
+    //0 8 5
+    assert_eq!(descriptors[11].encode(), [0b00_001000, 5]);
+    //0 5 2
+    assert_eq!(descriptors[12].encode(), [0b00_000101, 2]);
+    //0 6 2
+    assert_eq!(descriptors[13].encode(), [0b00_000110, 2]);
+    //0 8 5
+    assert_eq!(descriptors[14].encode(), [0b00_001000, 5]);
+    //0 19 107
+    assert_eq!(descriptors[15].encode(), [0b00_010011, 107]);
+    //0 19 5
+    assert_eq!(descriptors[16].encode(), [0b00_010011, 5]);
+    //0 19 6
+    assert_eq!(descriptors[17].encode(), [0b00_010011, 6]);
+    //0 19 108
+    assert_eq!(descriptors[18].encode(), [0b00_010011, 108]);
+    //0 19 109
+    assert_eq!(descriptors[19].encode(), [0b00_010011, 109]);
+    //0 19 110
+    assert_eq!(descriptors[20].encode(), [0b00_010011, 110]);
+    //0 19 111
+    assert_eq!(descriptors[21].encode(), [0b00_010011, 111]);
+    //0 19 112
+    assert_eq!(descriptors[22].encode(), [0b00_010011, 112]);
+    //0 19 113
+    assert_eq!(descriptors[23].encode(), [0b00_010011, 113]);
+    //0 19 114
+    assert_eq!(descriptors[24].encode(), [0b00_010011, 114]);
+    //0 19 115
+    assert_eq!(descriptors[25].encode(), [0b00_010011, 115]);
+    //0 19 116
+    assert_eq!(descriptors[26].encode(), [0b00_010011, 116]);
+    //0 19 117
+    assert_eq!(descriptors[27].encode(), [0b00_010011, 117]);
+    //0 19 118
+    assert_eq!(descriptors[28].encode(), [0b00_010011, 118]);
+    //0 19 119
+    assert_eq!(descriptors[29].encode(), [0b00_010011, 119]);
+
+    let section4 = message.section4();
+    assert_eq!(section4.length(), 45);
+
+    let data = section4.data();
+    assert_eq!(data.len(), 41);
+
     Ok(())
 }
 

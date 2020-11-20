@@ -17,6 +17,10 @@ pub enum Error {
     #[error("BUFR message should start with BUFR")]
     MagicNumber,
 
+    /// Wrong end section
+    #[error("BUFR message should end with 7777")]
+    EndSection,
+
     /// Message shorter than specified on section 0
     #[error("Message shorter than expected, is it truncated?")]
     TruncatedMessage,
@@ -25,6 +29,7 @@ pub enum Error {
     #[error("BUFR version {0} not supported")]
     VersionNotSupported(u8),
 
+    /*
     /// Number of descriptors doesn't match the size
     #[error("Expected {n_descriptors} descriptors, requiring {descriptor_size}B but buffer size {buffer_size}B")]
     WrongNumberOfDescriptors {
@@ -32,6 +37,9 @@ pub enum Error {
         descriptor_size: usize,
         buffer_size: usize,
     },
+    */
+    #[error("Section 3 must be larger than 7 and an odd number, got {0}")]
+    InvalidSection3Length(usize),
 }
 
 /// A parsed BUFR message
@@ -40,6 +48,7 @@ pub struct Message {
     version: u8,
     section1: Section1,
     section3: Section3,
+    section4: Section4,
 }
 
 /// Identification Section (section 1) of the BUFR format
@@ -232,6 +241,7 @@ impl Section1v4 {
 pub struct Section3 {
     length: usize,
     // 4th byte is reserved
+    n_subsets: u16,
     is_observed: bool,
     is_compressed: bool,
     descriptors: Vec<Descriptor>,
@@ -250,6 +260,7 @@ impl Section3 {
         assert_eq!(buf[3], 0);
         // number of descriptors
         let n_subsets = (u16::from(buf[4]) << 8) + u16::from(buf[5]);
+        /*
         if length != 7 + 2 * usize::from(n_subsets) {
             return Err(Error::WrongNumberOfDescriptors {
                 n_descriptors: n_subsets,
@@ -257,6 +268,7 @@ impl Section3 {
                 buffer_size: length,
             });
         };
+        */
 
         let (is_observed, is_compressed) = match buf[6] {
             0 => (false, false),
@@ -267,17 +279,59 @@ impl Section3 {
         };
 
         let mut descriptors = vec![];
-        for chunk in buf[8..length].chunks(2) {
+        if (length - 7) % 2 != 0 {
+            return Err(Error::InvalidSection3Length(length));
+        }
+        for chunk in buf[7..length].chunks(2) {
             let descriptor = parse_descriptor(chunk.try_into().unwrap());
             descriptors.push(descriptor);
         }
 
         Ok(Section3 {
             length,
+            n_subsets,
             is_observed,
             is_compressed,
             descriptors,
         })
+    }
+
+    pub fn length(&self) -> usize {
+        self.length
+    }
+
+    pub fn descriptors(&self) -> Vec<Descriptor> {
+        self.descriptors.clone()
+    }
+}
+
+pub struct Section4 {
+    length: usize,
+    data: Vec<u8>,
+}
+
+impl Section4 {
+    pub fn length(&self) -> usize {
+        self.length
+    }
+
+    pub fn data(&self) -> Vec<u8> {
+        self.data.clone()
+    }
+
+    fn decode(buf: &[u8]) -> Result<Section4, Error> {
+        if buf.len() < 3 {
+            return Err(Error::MessageTooShort);
+        }
+        let length = (usize::from(buf[0]) << 16) + (usize::from(buf[1]) << 8) + usize::from(buf[2]);
+        if (buf.len() as usize) < length {
+            return Err(Error::TruncatedMessage);
+        }
+        // 4th byte reserved, set to zero
+        assert_eq!(buf[3], 0);
+        let data = buf[4..length].into();
+
+        Ok(Section4 { length, data })
     }
 }
 
@@ -295,6 +349,16 @@ impl Message {
     /// Section 1 of the Message
     pub fn section1(&self) -> &Section1 {
         &self.section1
+    }
+
+    /// Section 3 of the Message
+    pub fn section3(&self) -> &Section3 {
+        &self.section3
+    }
+
+    /// Section 4 of the Message
+    pub fn section4(&self) -> &Section4 {
+        &self.section4
     }
 }
 
@@ -333,19 +397,28 @@ pub fn decode(buf: &[u8]) -> Result<Message, Error> {
         unimplemented!()
     }
 
-    let section3 = Section3::decode(&buf[offset..], version)?;
+    let section3 = Section3::decode(&buf[offset..])?;
     offset += section3.length();
+
+    let section4 = Section4::decode(&buf[offset..])?;
+    offset += section4.length();
+
+    if &buf[offset..(offset + 4)] != b"7777" {
+        return Err(Error::EndSection);
+    }
 
     Ok(Message {
         total_length,
         version,
         section1,
         section3,
+        section4,
     })
 }
 
 /// Struct for a descriptor
-struct Descriptor {
+#[derive(Debug, Clone, PartialEq)]
+pub struct Descriptor {
     f: u8,
     x: u8,
     y: u8,
@@ -358,7 +431,7 @@ struct Descriptor {
 /// - x (2 bits):
 /// - y (8 bits):
 fn parse_descriptor(buf: [u8; 2]) -> Descriptor {
-    let f = buf[0] & 0b11000000 >> 6;
+    let f = (buf[0] & 0b11000000) >> 6;
     let x = buf[0] & 0b00111111;
     let y = buf[1];
 
@@ -366,7 +439,7 @@ fn parse_descriptor(buf: [u8; 2]) -> Descriptor {
 }
 
 impl Descriptor {
-    fn encode_descriptor(&self) -> [u8; 2] {
+    pub fn encode(&self) -> [u8; 2] {
         let mut buf = [0u8; 2];
         buf[0] = (self.f << 6) + self.x;
         buf[1] = self.y;
@@ -376,16 +449,60 @@ impl Descriptor {
 
 #[cfg(test)]
 mod tests {
-    use super::parse_descriptor;
+    use super::{parse_descriptor, Descriptor};
 
     #[test]
     fn encode_descriptor_1() {
         let test_data = [0, 0];
         let descriptor = parse_descriptor(test_data);
-        let result = descriptor.encode_descriptor();
+        let result = descriptor.encode();
 
         assert_eq!(test_data, result);
     }
+
+    #[test]
+    fn encode_descriptor_2() {
+        let test_data = [0x00, 0];
+        let descriptor = parse_descriptor(test_data);
+        assert_eq!(descriptor, Descriptor { f: 0, x: 0, y: 0 });
+    }
+
+    #[test]
+    fn encode_descriptor_001() {
+        //let test_data = [0xc1, 1];
+        let test_data = [0x00, 1];
+        let descriptor = parse_descriptor(test_data);
+        assert_eq!(descriptor, Descriptor { f: 0, x: 0, y: 1 });
+    }
+
+    #[test]
+    fn encode_descriptor_010() {
+        let test_data = [0x01, 0];
+        let descriptor = parse_descriptor(test_data);
+        assert_eq!(descriptor, Descriptor { f: 0, x: 1, y: 0 });
+    }
+
+    #[test]
+    fn encode_descriptor_3630() {
+        let test_data = [0xff, 0];
+        let descriptor = parse_descriptor(test_data);
+        assert_eq!(descriptor, Descriptor { f: 3, x: 63, y: 0 });
+    }
+
+    #[test]
+    fn encode_descriptor_3ff() {
+        let test_data = [0xff, 0xff];
+        let descriptor = parse_descriptor(test_data);
+        assert_eq!(
+            descriptor,
+            Descriptor {
+                f: 3,
+                x: 63,
+                y: 255
+            }
+        );
+    }
+
     #[test]
     fn parse_descriptor_1() {
         let test_data = [0, 0];
