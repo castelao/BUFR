@@ -348,7 +348,7 @@ struct Descriptor {
 /// - x (2 bits):
 /// - y (8 bits):
 fn parse_descriptor(buf: [u8; 2]) -> Descriptor {
-    let f = buf[0] & 0b11000000;
+    let f = buf[0] & 0b11000000 >> 6;
     let x = buf[0] & 0b00111111;
     let y = buf[1];
 
