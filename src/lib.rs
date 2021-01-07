@@ -533,3 +533,110 @@ mod tests {
         assert_eq!(descriptor.y, 1);
     }
 }
+
+struct BufferStream {
+    buffer: Vec<u8>,
+    offset: usize,
+}
+
+impl BufferStream {
+    fn consume(&self, width: usize) -> Result(Vec<u8>, Error) {
+        let start = self.offset;
+        self.offset = self.offset + width;
+        Ok(self.buffer[start..self.offset])
+    }
+}
+
+fn width_value_from_table(x: u8, y: u8) {
+    match x {
+        1 =>
+            match y {
+                27 => 80,
+            }
+        },
+        5 => {
+            match y {
+                2 => 2,
+            }
+        },
+        6 => {
+            match y {
+                2 => 2,
+            }
+        },
+        8 => {
+            match y {
+                5 => 4,
+            }
+        },
+        19 => {
+            match y {
+                5 => 0,
+                6 => 0,
+                107 => 0,
+                108 => 0,
+                109 => 0,
+                110 => 0,
+                111 => 0,
+                112 => 0,
+                113 => 0,
+                114 => 0,
+                115 => 0,
+                116 => 0,
+                117 => 0,
+                118 => 0,
+                119 => 0,
+                150 => 32,
+            }
+        }
+
+    }
+
+}
+
+/*
+fn width_value_from_table(x: u8, y: u8) -> (usize, Values) {
+    match (x, y) {
+        (1, 33) => (8, Values::Integer(0)),
+        _ => unimplemented!(),
+    }
+}
+
+enum Values {
+    Integer(u32),
+    String(String),
+    Array(Vec<u8>),
+    Float(f64),
+}
+
+struct DataIter {}
+
+3 00 002 -> 0 00 002, 0 00 003
+
+- 0 00 002
+- 0 00 003
+
+
+fn all_data(descriptors: &[Descriptor], data: &[u8]) -> DataIter<Item=Values> {
+    let data = section4.data();
+    let mut reader = BitReader::new(&data);
+}
+
+impl Iterator for DataIter {
+    Item = Values;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        unimplemented!()
+    }
+}
+
+fn consume_descriptor0(descriptor: &Descriptor, data: &[u8]) -> (Values, usize) {
+    let (width, type_) = width_value_from_table(descriptor.x, descriptor.y);
+    let value = match type_ {
+        Values::Integer(_) => Values::Integer(u32::from(data[0])),
+        _ => unimplemented!(),
+    };
+
+    (value, width)
+}
+*/
