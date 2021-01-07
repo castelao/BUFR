@@ -533,3 +533,50 @@ mod tests {
         assert_eq!(descriptor.y, 1);
     }
 }
+
+/*
+fn width_value_from_table(x: u8, y: u8) -> (usize, Values) {
+    match (x, y) {
+        (1, 33) => (8, Values::Integer(0)),
+        _ => unimplemented!(),
+    }
+}
+
+enum Values {
+    Integer(u32),
+    String(String),
+    Array(Vec<u8>),
+    Float(f64),
+}
+
+struct DataIter {}
+
+3 00 002 -> 0 00 002, 0 00 003
+
+- 0 00 002
+- 0 00 003
+
+
+fn all_data(descriptors: &[Descriptor], data: &[u8]) -> DataIter<Item=Values> {
+    let data = section4.data();
+    let mut reader = BitReader::new(&data);
+}
+
+impl Iterator for DataIter {
+    Item = Values;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        unimplemented!()
+    }
+}
+
+fn consume_descriptor0(descriptor: &Descriptor, data: &[u8]) -> (Values, usize) {
+    let (width, type_) = width_value_from_table(descriptor.x, descriptor.y);
+    let value = match type_ {
+        Values::Integer(_) => Values::Integer(u32::from(data[0])),
+        _ => unimplemented!(),
+    };
+
+    (value, width)
+}
+*/
