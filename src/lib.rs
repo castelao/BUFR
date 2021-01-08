@@ -534,6 +534,66 @@ mod tests {
     }
 }
 
+struct BufferStream {
+    buffer: Vec<u8>,
+    offset: usize,
+}
+
+impl BufferStream {
+    fn consume(&self, width: usize) -> Result(Vec<u8>, Error) {
+        let start = self.offset;
+        self.offset = self.offset + width;
+        Ok(self.buffer[start..self.offset])
+    }
+}
+
+fn width_value_from_table(x: u8, y: u8) {
+    match x {
+        1 =>
+            match y {
+                27 => 80,
+            }
+        },
+        5 => {
+            match y {
+                2 => 2,
+            }
+        },
+        6 => {
+            match y {
+                2 => 2,
+            }
+        },
+        8 => {
+            match y {
+                5 => 4,
+            }
+        },
+        19 => {
+            match y {
+                5 => 0,
+                6 => 0,
+                107 => 0,
+                108 => 0,
+                109 => 0,
+                110 => 0,
+                111 => 0,
+                112 => 0,
+                113 => 0,
+                114 => 0,
+                115 => 0,
+                116 => 0,
+                117 => 0,
+                118 => 0,
+                119 => 0,
+                150 => 32,
+            }
+        }
+
+    }
+
+}
+
 /*
 fn width_value_from_table(x: u8, y: u8) -> (usize, Values) {
     match (x, y) {
