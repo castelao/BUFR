@@ -449,7 +449,7 @@ impl Descriptor {
 
 #[cfg(test)]
 mod tests {
-    use super::{parse_descriptor, Descriptor};
+    use super::{parse_descriptor, BufferReader, Descriptor};
 
     #[test]
     fn encode_descriptor_1() {
@@ -532,66 +532,80 @@ mod tests {
         assert_eq!(descriptor.x, 42);
         assert_eq!(descriptor.y, 1);
     }
-}
 
-struct BufferStream {
-    buffer: Vec<u8>,
-    offset: usize,
-}
+    #[test]
+    fn test_buffer_reader_zero() {
+        let buffer = vec![];
+        let mut reader = BufferReader::new(&buffer[..]);
+        reader.consume(0).unwrap();
+    }
 
-impl BufferStream {
-    fn consume(&self, width: usize) -> Result(Vec<u8>, Error) {
-        let start = self.offset;
-        self.offset = self.offset + width;
-        Ok(self.buffer[start..self.offset])
+    #[test]
+    fn test_buffer_reader_1() {
+        let buffer = vec![0b11110000, 0b00001111];
+        let mut reader = BufferReader::new(&buffer[..]);
+        assert_eq!(reader.consume(4).unwrap(), &[0b0000_1111]);
+        assert_eq!(reader.consume(8).unwrap(), &[0b0000_0000]);
+        assert_eq!(reader.consume(4).unwrap(), &[0b0000_1111]);
     }
 }
 
-fn width_value_from_table(x: u8, y: u8) {
-    match x {
-        1 =>
-            match y {
-                27 => 80,
-            }
-        },
-        5 => {
-            match y {
-                2 => 2,
-            }
-        },
-        6 => {
-            match y {
-                2 => 2,
-            }
-        },
-        8 => {
-            match y {
-                5 => 4,
-            }
-        },
-        19 => {
-            match y {
-                5 => 0,
-                6 => 0,
-                107 => 0,
-                108 => 0,
-                109 => 0,
-                110 => 0,
-                111 => 0,
-                112 => 0,
-                113 => 0,
-                114 => 0,
-                115 => 0,
-                116 => 0,
-                117 => 0,
-                118 => 0,
-                119 => 0,
-                150 => 32,
-            }
+struct BufferReader<'a> {
+    buffer: bitreader::BitReader<'a>,
+}
+
+impl<'a> BufferReader<'a> {
+    fn new(buffer: &'a [u8]) -> Self {
+        Self {
+            buffer: bitreader::BitReader::new(buffer),
         }
-
     }
 
+    /// offset in bits !!!!
+    fn consume(&mut self, width: usize) -> Result<Vec<u8>, Error> {
+        let chunks = width / 8;
+        let mut result = vec![0; chunks];
+
+        self.buffer
+            .read_u8_slice(&mut result[..])
+            .expect("Width too large");
+
+        if width > (chunks * 8) {
+            let remainder = self
+                .buffer
+                .read_u8(width as u8 % 8)
+                .expect("Width too large");
+            result.push(remainder);
+        };
+
+        Ok(result)
+    }
+}
+
+fn width_value_from_table(x: u8, y: u8) -> usize {
+    match (x, y) {
+        (1, 27) => 80,
+        (5, 2) => 2,
+        (6, 2) => 2,
+        (8, 5) => 4,
+        (19, 5) => 9,
+        (19, 6) => 14,
+        (19, 107) => 4,
+        (19, 108) => 3,
+        (19, 109) => 4,
+        (19, 110) => 4,
+        (19, 111) => 7,
+        (19, 112) => 7,
+        (19, 113) => 4,
+        (19, 114) => 7,
+        (19, 115) => 6,
+        (19, 116) => 7,
+        (19, 117) => 3,
+        (19, 118) => 7,
+        (19, 119) => 3,
+        (19, 150) => 32,
+        _ => unimplemented!(),
+    }
 }
 
 /*
