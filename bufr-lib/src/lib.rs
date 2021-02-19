@@ -43,6 +43,7 @@ pub enum Error {
 }
 
 /// A parsed BUFR message
+#[derive(Debug)]
 pub struct Message {
     total_length: u32,
     version: u8,
@@ -52,6 +53,7 @@ pub struct Message {
 }
 
 /// Identification Section (section 1) of the BUFR format
+#[derive(Debug)]
 pub enum Section1 {
     /// Version 3 for the section 1
     V3(Section1v3),
@@ -86,7 +88,7 @@ impl Section1 {
 }
 
 /// Version 3 variant of the Section 1
-#[derive(CopyGetters, Getters)]
+#[derive(CopyGetters, Getters, Debug)]
 pub struct Section1v3 {
     length: usize,
     master_table: u8,
@@ -139,7 +141,7 @@ impl Section1v3 {
 
 /// Version 4 variant of the Section 1
 #[allow(missing_docs)]
-#[derive(CopyGetters, Getters)]
+#[derive(CopyGetters, Getters, Debug)]
 pub struct Section1v4 {
     length: usize,
     #[getset(get_copy = "pub")]
@@ -238,6 +240,7 @@ impl Section1v4 {
 }
 
 /// Data description Section (section 3) of the BUFR format
+#[derive(Debug)]
 pub struct Section3 {
     length: usize,
     // 4th byte is reserved
@@ -305,6 +308,7 @@ impl Section3 {
     }
 }
 
+#[derive(Debug)]
 pub struct Section4 {
     length: usize,
     data: Vec<u8>,
@@ -609,6 +613,27 @@ fn width_value_from_table(x: u8, y: u8) -> usize {
 }
 
 /*
+
+use serde::{Serializer, Deserializer};
+
+#[derive(Serializer, Deserializer)]
+struct qualquer {
+ x: u8,
+ y: u8
+}
+
+let values: Vec<qualquer> = serde_json::from_reader(buffer)?;
+
+[{x:1, y:2}, {x:2, y:4}]
+
+>>> {'a': 11, 'b': 12}
+
+let guardar: Vec<qualquer> = vec![];
+
+let novo: BTreeMap<u64, String> = guardar.iter().filter(|x| x > 0).map(|y| (y +1, y+2)).collect();
+
+ */
+/*
 fn width_value_from_table(x: u8, y: u8) -> (usize, Values) {
     match (x, y) {
         (1, 33) => (8, Values::Integer(0)),
@@ -616,14 +641,40 @@ fn width_value_from_table(x: u8, y: u8) -> (usize, Values) {
     }
 }
 
+type FieldName = String;
 enum Values {
     Integer(u32),
     String(String),
-    Array(Vec<u8>),
+    Array(Vec<Value>),
     Float(f64),
+    Map(HashMap<FieldName, Value>)
 }
 
-struct DataIter {}
+struct DataIter<'a> {
+  buffer: BufferReader<'a>,
+  descriptors: Vec<Descriptor>
+  processing_values: Vec<Values>
+}
+
+impl Message {
+  fn<'a> iter(&'a self) -> DataIter<'a> {
+    DataIter {
+      buffer: self.section4.data(),
+      descriptors: self.descriptors()
+    }
+  }
+
+    fn all_data(descriptors: &[Descriptor], data: &[u8]) -> DataIter<Item=Values> {
+        let data = section4.data();
+        let mut reader = BitReader::new(&data);
+    }
+
+}
+
+let m: Message = BUFR::decode(...);
+for field in m.iter() {
+
+}
 
 3 00 002 -> 0 00 002, 0 00 003
 
@@ -631,12 +682,7 @@ struct DataIter {}
 - 0 00 003
 
 
-fn all_data(descriptors: &[Descriptor], data: &[u8]) -> DataIter<Item=Values> {
-    let data = section4.data();
-    let mut reader = BitReader::new(&data);
-}
-
-impl Iterator for DataIter {
+impl Iterator for DataIter<'a> {
     Item = Values;
 
     fn next(&mut self) -> Option<Self::Item> {
