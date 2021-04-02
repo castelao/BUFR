@@ -3,6 +3,7 @@
 //! Module level docs
 
 use std::convert::TryInto;
+use std::fmt;
 
 use getset::{CopyGetters, Getters};
 
@@ -52,6 +53,19 @@ pub struct Message {
     section4: Section4,
 }
 
+impl fmt::Display for Message {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        writeln!(f, "BUFR version {}", self.version)?;
+        writeln!(f, "     total length: {}", self.total_length)?;
+        writeln!(f, "")?;
+        writeln!(f, "{}", self.section1)?;
+        writeln!(f, "")?;
+        writeln!(f, "{}", self.section3)?;
+        writeln!(f, "")?;
+        writeln!(f, "{:?}", self.section4)
+    }
+}
+
 /// Identification Section (section 1) of the BUFR format
 #[derive(Debug)]
 pub enum Section1 {
@@ -59,6 +73,12 @@ pub enum Section1 {
     V3(Section1v3),
     /// Version 4 for the section 1
     V4(Section1v4),
+}
+
+impl fmt::Display for Section1 {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        writeln!(f, "{:?}", self)
+    }
 }
 
 impl Section1 {
@@ -250,6 +270,33 @@ pub struct Section3 {
     descriptors: Vec<Descriptor>,
 }
 
+impl fmt::Display for Section3 {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        writeln!(f, "Section 3")?;
+        writeln!(f, "length: {:?}", self.length())?;
+        writeln!(f, "is observed: {:?}", self.is_observed())?;
+        writeln!(f, "is compressed: {:?}", self.is_compressed())?;
+
+        let mut ident = String::new();
+        ident.extend("    ".chars());
+
+        let mut n = 0;
+        let mut iter = self.descriptors.iter();
+        while let Some(d) = iter.next() {
+            if d.f == 1 {
+                if let Some(dd) = iter.next() {
+                    writeln!(f, "{}{:?} + {:?}", ident, d, dd)?;
+                }
+                // n = if d.y == 0 { d.x + 1 } else { d.x };
+                ident.extend("    ".chars());
+            } else {
+                writeln!(f, "{}{:?}", ident, d)?;
+            };
+        }
+        Ok(())
+    }
+}
+
 impl Section3 {
     fn decode(buf: &[u8]) -> Result<Section3, Error> {
         if buf.len() < 8 {
@@ -301,6 +348,14 @@ impl Section3 {
 
     pub fn length(&self) -> usize {
         self.length
+    }
+
+    pub fn is_observed(&self) -> bool {
+        self.is_observed
+    }
+
+    pub fn is_compressed(&self) -> bool {
+        self.is_compressed
     }
 
     pub fn descriptors(&self) -> Vec<Descriptor> {

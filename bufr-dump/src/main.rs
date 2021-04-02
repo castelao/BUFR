@@ -21,7 +21,7 @@ fn main() -> Result<()> {
 
     let data = bufr::decode(&buffer[..])?;
 
-    dbg!(data);
+    println!("{}", data);
 
     Ok(())
 }
