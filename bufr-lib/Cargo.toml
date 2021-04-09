@@ -8,5 +8,7 @@ edition = "2018"
 
 [dependencies]
 bitreader="0.3"
+csv="1.1"
 thiserror = "1.0"
 getset = "0.1.1"
+serde = { version = "1.0.125", features = ["derive"] }

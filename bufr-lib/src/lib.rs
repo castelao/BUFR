@@ -2,6 +2,8 @@
 
 //! Module level docs
 
+mod tables;
+
 use std::convert::TryInto;
 use std::fmt;
 
