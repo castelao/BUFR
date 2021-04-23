@@ -1,5 +1,6 @@
 use serde::Deserialize;
 
+#[allow(non_snake_case)]
 #[derive(Debug, Deserialize)]
 struct Record {
     ClassNo: String,
@@ -34,13 +35,15 @@ mod tests {
         let file = File::open(&filename).expect(&format!("Error loading file: {:?}", &filename));
         let mut reader = BufReader::new(file);
 
-        let mut table: HashMap<String, Record> = HashMap::default();
+        let mut table: HashMap<(u8, u8), Record> = HashMap::default();
 
         let mut rdr = csv::Reader::from_reader(reader);
         for result in rdr.deserialize() {
             let record: Record = result.expect("Error leading record");
-            println!("{:?}", record);
-            //table.insert((record.FXY).clone(), record);
+            //let f: u8 = record.FXY.get(0..1).expect("").parse().expect("");
+            let x: u8 = record.FXY.get(1..=2).expect("").parse().expect("");
+            let y: u8 = dbg!(record.FXY.get(3..)).expect("").parse().expect("");
+            table.insert((x, y), record);
         }
         dbg!(table);
         assert!(false);
