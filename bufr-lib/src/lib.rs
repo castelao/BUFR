@@ -7,6 +7,7 @@ mod tables;
 use std::convert::TryInto;
 use std::fmt;
 
+use byteorder::{BigEndian, WriteBytesExt};
 use getset::{CopyGetters, Getters};
 
 /// Possible errors when parsing BUFR messages
@@ -43,6 +44,9 @@ pub enum Error {
     */
     #[error("Section 3 must be larger than 7 and an odd number, got {0}")]
     InvalidSection3Length(usize),
+
+    #[error(transparent)]
+    IOError(#[from] std::io::Error),
 }
 
 /// A parsed BUFR message
@@ -253,6 +257,34 @@ impl Section1v4 {
             second,
             local_use,
         })
+    }
+
+    pub fn encode<W: std::io::Write>(&self, wtr: &mut W) -> Result<usize, Error> {
+        wtr.write_u24::<BigEndian>(self.length.try_into().unwrap())?;
+        wtr.write_u8(self.master_table)?;
+        wtr.write_u16::<BigEndian>(self.center)?;
+        wtr.write_u16::<BigEndian>(self.sub_center)?;
+        wtr.write_u8(self.update_version)?;
+        if self.optional_section {
+            wtr.write_u8(64)?;
+        } else {
+            wtr.write_u8(0)?;
+        };
+        wtr.write_u8(self.data_category)?;
+        wtr.write_u8(self.data_subcategory)?;
+        wtr.write_u8(self.local_subcategory)?;
+        wtr.write_u8(self.master_table_version)?;
+        wtr.write_u8(self.local_table_version)?;
+        wtr.write_u16::<BigEndian>(self.year)?;
+        wtr.write_u8(self.month)?;
+        wtr.write_u8(self.day)?;
+        wtr.write_u8(self.hour)?;
+        wtr.write_u8(self.minute)?;
+        wtr.write_u8(self.second)?;
+        if !self.local_use.is_empty() {
+            wtr.write_all(&self.local_use)?;
+        };
+        Ok(())
     }
 
     /// Length of the Section 1

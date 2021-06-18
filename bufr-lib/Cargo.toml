@@ -12,3 +12,4 @@ csv="1.1"
 thiserror = "1.0"
 getset = "0.1.1"
 serde = { version = "1.0.125", features = ["derive"] }
+byteorder = "1.4.3"
