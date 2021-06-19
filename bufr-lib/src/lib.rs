@@ -96,6 +96,14 @@ impl Section1 {
         })
     }
 
+    fn encode(&self, wtr: &mut W) -> Result<(), Error> {
+        Ok(match version {
+            3 => Section1::V3(Section1v3::decode(&buf[..])?),
+            4 => Section1::V4(Section1v4::decode(&buf[..])?),
+            _ => unimplemented!(),
+        })
+    }
+
     /// Length of the Section 1
     pub fn length(&self) -> usize {
         match self {
@@ -240,8 +248,8 @@ impl Section1v4 {
         Ok(Section1v4 {
             length,
             master_table,
-            sub_center,
             center,
+            sub_center,
             update_version,
             optional_section,
             data_category,
