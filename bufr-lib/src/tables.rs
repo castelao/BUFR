@@ -70,10 +70,12 @@ pub fn load_table_f3<P: AsRef<Path>>(filename: P) -> TableF3 {
     let mut rdr = csv::Reader::from_reader(reader);
     for result in rdr.deserialize() {
         let record: RecordF3 = result.expect("Error leading record");
+        /*
         let f: u8 = record.FXY.get(0..1).expect("").parse().expect("");
         let x: u8 = record.FXY.get(1..=2).expect("").parse().expect("");
         let y: u8 = record.FXY.get(3..).expect("").parse().expect("");
         table.insert((f, x, y), record);
+        */
     }
     table
 }

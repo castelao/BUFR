@@ -122,6 +122,26 @@ fn simple_parse() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 #[test]
+fn encode_1() -> Result<(), Box<dyn std::error::Error>> {
+    let mut filename = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    filename.push("../tests/data/wmo_sarep.bufr");
+
+    let file = File::open(&filename).expect(&format!("Error loading file: {:?}", &filename));
+    let mut reader = BufReader::new(file);
+
+    let mut buffer = Vec::new();
+    reader.read_to_end(&mut buffer)?;
+
+    let message = bufr::decode(&buffer)?;
+    let mut encoded = vec![];
+    message.encode(&mut encoded)?;
+
+    assert_eq!(buffer[0..30], encoded);
+
+    Ok(())
+}
+
+#[test]
 fn too_short() {
     let buf = [0; 8];
     for i in 0..8 {

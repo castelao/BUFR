@@ -96,12 +96,11 @@ impl Section1 {
         })
     }
 
-    fn encode(&self, wtr: &mut W) -> Result<(), Error> {
-        Ok(match version {
-            3 => Section1::V3(Section1v3::decode(&buf[..])?),
-            4 => Section1::V4(Section1v4::decode(&buf[..])?),
+    fn encode<W: std::io::Write>(&self, wtr: &mut W) -> Result<usize, Error> {
+        match self {
+            Section1::V4(v) => v.encode(wtr),
             _ => unimplemented!(),
-        })
+        }
     }
 
     /// Length of the Section 1
@@ -292,7 +291,9 @@ impl Section1v4 {
         if !self.local_use.is_empty() {
             wtr.write_all(&self.local_use)?;
         };
-        Ok(())
+
+        // FIXME: does wtr have a counter?
+        Ok(8 + 22 + self.local_use.len())
     }
 
     /// Length of the Section 1
@@ -460,6 +461,18 @@ impl Message {
     /// Section 4 of the Message
     pub fn section4(&self) -> &Section4 {
         &self.section4
+    }
+
+    pub fn encode<W: std::io::Write>(&self, wtr: &mut W) -> Result<usize, Error> {
+        wtr.write_all(b"BUFR")?;
+        wtr.write_u24::<BigEndian>(self.total_length)?;
+
+        wtr.write_u8(self.version)?;
+
+        self.section1.encode(wtr)?;
+
+        // FIXME proper size
+        Ok(self.total_length as usize)
     }
 }
 
