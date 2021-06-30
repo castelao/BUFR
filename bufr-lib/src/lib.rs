@@ -302,6 +302,47 @@ impl Section1v4 {
     }
 }
 
+#[cfg(test)]
+mod test_section1 {
+    use super::Section1v4;
+
+    #[test]
+    // A test case from a Spray profile
+    fn v4_encode_spray_ph() -> Result<(), Box<dyn std::error::Error>> {
+        let section = Section1v4 {
+            length: 22,
+            master_table: 0,
+            // Figure out center
+            center: 65535,
+            // Figure out sub center code
+            sub_center: 65535,
+            update_version: 0,
+            optional_section: false,
+            // Confirm category and subcategory
+            data_category: 31,
+            data_subcategory: 255,
+            local_subcategory: 255,
+            master_table_version: 255,
+            local_table_version: 255,
+            year: 2020,
+            month: 10,
+            day: 6,
+            hour: 19,
+            minute: 24,
+            second: 0,
+            local_use: vec![],
+        };
+        let mut buf = vec![];
+        section.encode(&mut buf)?;
+        let ans = vec![
+            0, 0, 22, 0, 255, 255, 255, 255, 0, 0, 31, 255, 255, 255, 255, 7, 228, 10, 6, 19, 24, 0,
+        ];
+        assert_eq!(buf, ans);
+
+        Ok(())
+    }
+}
+
 /// Data description Section (section 3) of the BUFR format
 #[derive(Debug)]
 pub struct Section3 {
