@@ -430,6 +430,23 @@ impl Section3 {
         })
     }
 
+    pub fn encode<W: std::io::Write>(&self, wtr: &mut W) -> Result<usize, Error> {
+        wtr.write_u24::<BigEndian>(self.length.try_into().unwrap())?;
+        wtr.write_u8(0)?;
+        wtr.write_u16::<BigEndian>(self.n_subsets)?;
+        wtr.write_u8(match (self.is_observed, self.is_compressed) {
+            (false, false) => 0,
+            (false, true) => 0b01_000000,
+            (true, false) => 0b10_000000,
+            (true, true) => 0b11_000000,
+        })?;
+        let mut n: usize = 0;
+        for fxy in &self.descriptors {
+            n += fxy.encode(wtr).unwrap();
+        }
+        Ok(1)
+    }
+
     pub fn length(&self) -> usize {
         self.length
     }
@@ -444,6 +461,28 @@ impl Section3 {
 
     pub fn descriptors(&self) -> Vec<Descriptor> {
         self.descriptors.clone()
+    }
+}
+
+#[cfg(test)]
+mod test_section3 {
+    use super::{Descriptor, Section3};
+
+    #[test]
+    // A test case from a Spray profile
+    fn encode_spray_ph() -> Result<(), Box<dyn std::error::Error>> {
+        let descriptor = Descriptor { f: 3, x: 15, y: 12 };
+        let section = Section3 {
+            length: 9,
+            n_subsets: 1,
+            is_observed: true,
+            is_compressed: false,
+            descriptors: vec![descriptor],
+        };
+        let mut buf = vec![];
+        section.encode(&mut buf)?;
+
+        Ok(())
     }
 }
 
@@ -594,11 +633,10 @@ fn parse_descriptor(buf: [u8; 2]) -> Descriptor {
 }
 
 impl Descriptor {
-    pub fn encode(&self) -> [u8; 2] {
-        let mut buf = [0u8; 2];
-        buf[0] = (self.f << 6) + self.x;
-        buf[1] = self.y;
-        buf
+    pub fn encode<W: std::io::Write>(&self, wtr: &mut W) -> Result<usize, Error> {
+        wtr.write_u8((self.f << 6) + self.x)?;
+        wtr.write_u8(self.y)?;
+        Ok(2)
     }
 }
 
@@ -610,9 +648,11 @@ mod tests {
     fn encode_descriptor_1() {
         let test_data = [0, 0];
         let descriptor = parse_descriptor(test_data);
-        let result = descriptor.encode();
+        let mut result = vec![];
+        let n = descriptor.encode(&mut result).unwrap();
 
-        assert_eq!(test_data, result);
+        assert_eq!(test_data, result[..]);
+        assert_eq!(n, 2);
     }
 
     #[test]
