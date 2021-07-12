@@ -803,6 +803,127 @@ fn width_value_from_table(x: u8, y: u8) -> usize {
     }
 }
 
+enum BUFRUnit{
+    Numeric,
+    CodeTable,
+    CCITTIA5,
+}
+
+// scale: The power of 10 by which the element has been multiplied prior to encoding.
+// reference: A number to be subtracted from the element, after scaling (if any), and prior to encoding.
+pub struct ElementDescriptor {
+    name: String,
+    unit: BUFRUnit,
+    scale: i32,
+    reference_value: i32,
+    data_width: u8,
+}
+
+// Testing WIP
+// F=0
+fn element_descriptor(x:u8, y: u8) -> Result<ElementDescriptor, Error> {
+    let element = match (x, y) {
+        (1, 19) => ElementDescriptor{name: String::from("Long station or site name"), unit: BUFRUnit::CCITTIA5, scale: 0, reference_value: 0, data_width: 256},
+        (1, 36) => ElementDescriptor{name: String::from("Agency in charge of operating the observing platform"), unit: BUFRUnit::CodeTable, scale: 0, reference_value: 0, data_width: 20},
+        (1, 85) => ElementDescriptor{name: String::from("Observing platform manufacturer's model"), unit: BUFRUnit::CCITTIA5, scale: 0, reference_value: 0, data_width: 160},
+        (1, 86) => ElementDescriptor{name: String::from("Observing platform manufacturer's serial number"), unit: BUFRUnit::CCITTIA5, scale: 0, reference_value: 0, data_width: 256},
+        (1, 87) => ElementDescriptor{name: String::from("WMO marine observing platform extended identifier"), unit: BUFRUnit::Numeric, scale: 0, reference_value: 0, data_width: 23},
+        (1, 125) => ElementDescriptor{name: String::from("WIGOS identifier series"), unit: BUFRUnit::Numeric, scale: 0, reference_value: 0, data_width: 4},
+        (1, 126) => ElementDescriptor{name: String::from("WIGOS issuer of identifier"), unit: BUFRUnit::Numeric, scale: 0, reference_value: 0, data_width: 16},
+        (1, 127) => ElementDescriptor{name: String::from("WIGOS issue number"), unit: BUFRUnit::Numeric, scale: 0, reference_value: 0, data_width: 16},
+        (1, 128) => ElementDescriptor{name: String::from("WIGOS local identifier (character)"), unit: BUFRUnit::CCITTIA5, scale: 0, reference_value: 0, data_width: 128},
+        (4, 1) => ElementDescriptor{name: String::from("Year"), unit: BUFRUnit::a, scale: 0, reference_value: 0, data_width: 12},
+        (4, 2) => ElementDescriptor{name: String::from("Month"), unit: BUFRUnit::mon, scale: 0, reference_value: 0, data_width: 4},
+        (4, 3) => ElementDescriptor{name: String::from("Day"), unit: BUFRUnit::d, scale: 0, reference_value: 0, data_width: 6},
+        (4, 4) => ElementDescriptor{name: String::from("Hour"), unit: BUFRUnit::h, scale: 0, reference_value: 0, data_width: 5},
+        (4, 5) => ElementDescriptor{name: String::from("Minute"), unit: BUFRUnit::min, scale: 0, reference_value: 0, data_width: 6},
+        (4, 6) => ElementDescriptor{name: String::from("Second"), unit: BUFRUnit::s, scale: 0, reference_value: 0, data_width: 6},
+        (5, 1) => ElementDescriptor{name: String::from("Latitude (high accuracy)"), unit: BUFRUnit::deg, scale: 5, reference_value: -9000000, data_width: 25},
+        (6, 1) => ElementDescriptor{name: String::from("Longitude (high accuracy)"), unit: BUFRUnit::deg, scale: 5, reference_value: -18000000, data_width: 26},
+        (8, 21) => ElementDescriptor{name: String::from("Time significance"), unit: BUFRUnit::CodeTable, scale: 0, reference_value: 0, data_width: 5},
+        _ => unimplemented!(),
+    };
+    Ok(element)
+}
+// Testing WIP
+// Expand a sequence descriptor, i.e. F=3.
+// Note that it can contain another F=3
+fn flatten_sequence_descriptor(x: u8, y: u8) -> Vec<Descriptor> {
+    let output = match (x, y) {
+        (1, 150) => vec![
+            Descriptor(f:0 x:1 y:125),
+            Descriptor(f:0 x:1 y:126),
+            Descriptor(f:0 x:1 y:127),
+            Descriptor(f:0 x:1 y:128)],
+        (1, 11) => vec![
+            Descriptor(f:0 x:4 y:1),
+            Descriptor(f:0 x:4 y:2),
+            Descriptor(f:0 x:4 y:3)],
+        (1, 13) => vec![
+            Descriptor(f:0 x:4 y:4),
+            Descriptor(f:0 x:4 y:5),
+            Descriptor(f:0 x:4 y:6)],
+        (1, 21) => vec![
+            Descriptor(f:0 x:5 y:1),
+            Descriptor(f:0 x:6 y:1)],
+        // Incomplete. Missing descriptors for 15-12
+        (15, 12) => vec![
+            Descriptor(f:3 x:1 y:150),
+            Descriptor(f:0 x:1 y:87),
+            Descriptor(f:0 x:1 y:19),
+            Descriptor(f:0 x:1 y:36),
+            Descriptor(f:0 x:2 y:148),
+            Descriptor(f:0 x:1 y:85),
+            Descriptor(f:0 x:1 y:86),
+            Descriptor(f:0 x:8 y:21),
+            Descriptor(f:3 x:1 y:11),
+            Descriptor(f:3 x:1 y:13),
+            Descriptor(f:3 x:1 y:21),
+            Descriptor(f:0 x:11 y:104),
+            Descriptor(f:0 x:2 y:169),
+            Descriptor(f:0 x:11 y:002),
+            Descriptor(f:0 x:11 y:001),
+            Descriptor(f:0 x:2 y:169),
+            Descriptor(f:0 x:22 y:32),
+            Descriptor(f:0 x:22 y:005),
+            Descriptor(f:0 x:8 y:21),
+            Descriptor(f:0 x:4 y:25),
+            Descriptor(f:3 x:1 y:11),
+            Descriptor(f:3 x:1 y:13),
+            Descriptor(f:3 x:1 y:21),
+                ],
+        _ => unimplemented!()
+    }
+    return output;
+}
+
+/*
+3-01-150
+    0-01-125: None
+    0-01-126: None
+    0-01-127: None
+    0-01-128: None
+0-01-087: 4802982
+0-01-019: Monterey Bay
+0-01-036: Monterey Bay Aquarium Research Institute
+0-02-148:
+0-01-085: Spray
+0-01-086: 029
+0-08-021: 25
+3-01-011
+    0-04-001: 2020
+    0-04-002: 10
+    0-04-003: 06
+3-01-013
+    0-04-004: 19
+    0-04-005: 24
+    0-04-006: 00
+3-01-021
+    0-05-001: 36.803
+    0-06-001: -121.860
+0-11-104:
+ */
+
 /*
 
 use serde::{Serializer, Deserializer};
