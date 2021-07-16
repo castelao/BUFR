@@ -70,12 +70,15 @@ pub fn load_table_f3<P: AsRef<Path>>(filename: P) -> TableF3 {
     let mut rdr = csv::Reader::from_reader(reader);
     for result in rdr.deserialize() {
         let record: RecordF3 = result.expect("Error leading record");
-        /*
-        let f: u8 = record.FXY.get(0..1).expect("").parse().expect("");
-        let x: u8 = record.FXY.get(1..=2).expect("").parse().expect("");
-        let y: u8 = record.FXY.get(3..).expect("").parse().expect("");
-        table.insert((f, x, y), record);
-        */
+        let f: u8 = record.FXY1.get(0..1).expect("").parse().expect("");
+        assert_eq!(f, 3);
+        let x: u8 = record.FXY1.get(1..=2).expect("").parse().expect("");
+        let y: u8 = record.FXY1.get(3..).expect("").parse().expect("");
+        //table.insert((f, x, y), record);
+        table
+            .entry((x, y))
+            .and_modify(|v| v.push(record.clone()))
+            .or_insert(vec![record]);
     }
     table
 }
@@ -101,7 +104,18 @@ mod tests {
         filename.push("tables/BUFR_TableD_en_01.csv");
 
         let table = load_table_f3(filename);
-        assert!(false);
-        //assert_eq!(table.get(&(1, 154)).unwrap().BUFR_DataWidth_Bits, 12u16);
+        let record = table.get(&(1, 2)).unwrap();
+        assert_eq!(record.len(), 3);
+        assert_eq!(
+            record
+                .into_iter()
+                .map(|r| r.FXY2.clone())
+                .collect::<Vec<_>>(),
+            vec![
+                String::from("001003"),
+                String::from("001004"),
+                String::from("001005")
+            ]
+        );
     }
 }
