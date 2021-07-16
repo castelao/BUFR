@@ -823,7 +823,7 @@ pub struct ElementDescriptor {
     unit: BUFRUnit,
     scale: i32,
     reference_value: i32,
-    data_width: u8,
+    data_width: u16,
 }
 
 // Testing WIP
