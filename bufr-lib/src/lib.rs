@@ -803,10 +803,17 @@ fn width_value_from_table(x: u8, y: u8) -> usize {
     }
 }
 
-enum BUFRUnit{
+enum BUFRUnit {
     Numeric,
     CodeTable,
     CCITTIA5,
+    a,
+    mon,
+    d,
+    h,
+    min,
+    s,
+    deg,
 }
 
 // scale: The power of 10 by which the element has been multiplied prior to encoding.
