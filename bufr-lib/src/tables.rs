@@ -25,7 +25,7 @@ pub struct RecordF0 {
 }
 
 #[allow(non_snake_case)]
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct RecordF3 {
     Category: String,
     CategoryOfSequences_en: String,
@@ -33,9 +33,9 @@ pub struct RecordF3 {
     Title_en: Option<String>,
     SubTitle_en: Option<String>,
     FXY2: String,
-    ElementName_en: String,
-    ElementDescription_en: Option<String>,
-    Note_en: Option<String>,
+    //ElementName_en: String,
+    //ElementDescription_en: Option<String>,
+    //Note_en: Option<String>,
     Status: String,
 }
 

@@ -818,7 +818,7 @@ enum BUFRUnit {
 
 // scale: The power of 10 by which the element has been multiplied prior to encoding.
 // reference: A number to be subtracted from the element, after scaling (if any), and prior to encoding.
-pub struct ElementDescriptor {
+struct ElementDescriptor {
     name: String,
     unit: BUFRUnit,
     scale: i32,
@@ -963,6 +963,7 @@ fn element_descriptor(x: u8, y: u8) -> Result<ElementDescriptor, Error> {
 // Testing WIP
 // Expand a sequence descriptor, i.e. F=3.
 // Note that it can contain another F=3
+/*
 fn flatten_sequence_descriptor(x: u8, y: u8) -> Vec<Descriptor> {
     let output = match (x, y) {
         (1, 150) => vec![
@@ -1011,6 +1012,7 @@ fn flatten_sequence_descriptor(x: u8, y: u8) -> Vec<Descriptor> {
     }
     return output;
 }
+*/
 
 /*
 3-01-150
