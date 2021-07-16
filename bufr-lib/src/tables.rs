@@ -8,7 +8,7 @@ use serde::Deserialize;
 
 #[allow(non_snake_case)]
 #[derive(Debug, Deserialize)]
-pub struct RecordF1 {
+pub struct RecordF0 {
     ClassNo: String,
     ClassName_en: String,
     FXY: String,
@@ -39,19 +39,19 @@ pub struct RecordF3 {
     Status: String,
 }
 
-pub type TableF1 = HashMap<(u8, u8), RecordF1>;
+pub type TableF0 = HashMap<(u8, u8), RecordF0>;
 pub type TableF3 = HashMap<(u8, u8), Vec<RecordF3>>;
 
-pub fn load_table_f1<P: AsRef<Path>>(filename: P) -> TableF1 {
+pub fn load_table_f0<P: AsRef<Path>>(filename: P) -> TableF0 {
     let path = filename.as_ref();
     let file = File::open(path).expect(&format!("Error loading file: {:?}", path));
     let reader = BufReader::new(file);
 
-    let mut table = TableF1::default();
+    let mut table = TableF0::default();
 
     let mut rdr = csv::Reader::from_reader(reader);
     for result in rdr.deserialize() {
-        let record: RecordF1 = result.expect("Error leading record");
+        let record: RecordF0 = result.expect("Error leading record");
         //let f: u8 = record.FXY.get(0..1).expect("").parse().expect("");
         let x: u8 = record.FXY.get(1..=2).expect("").parse().expect("");
         let y: u8 = record.FXY.get(3..).expect("").parse().expect("");
@@ -82,16 +82,16 @@ pub fn load_table_f3<P: AsRef<Path>>(filename: P) -> TableF3 {
 
 #[cfg(test)]
 mod tests {
-    use super::{load_table_f1, load_table_f3};
+    use super::{load_table_f0, load_table_f3};
 
     use std::path::PathBuf;
 
     #[test]
-    fn test_load_f1() {
+    fn test_load_f0() {
         let mut filename = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
         filename.push("tables/BUFRCREX_TableB_en_01.csv");
 
-        let table = load_table_f1(filename);
+        let table = load_table_f0(filename);
         assert_eq!(table.get(&(1, 154)).unwrap().BUFR_DataWidth_Bits, 12u16);
     }
 
