@@ -6,22 +6,24 @@ use std::path::PathBuf;
 
 use serde::Deserialize;
 
+use crate::ElementDescriptor;
+
 #[allow(non_snake_case)]
 #[derive(Debug, Deserialize)]
 pub struct RecordF0 {
-    ClassNo: String,
-    ClassName_en: String,
+    ClassNo: String,      // X
+    ClassName_en: String, // Identification: String
     FXY: String,
-    ElementName_en: String,
+    ElementName_en: String, // Name: String
     Note_en: Option<String>,
     BUFR_Unit: String,
-    BUFR_Scale: i8,
-    BUFR_ReferenceValue: i64,
+    BUFR_Scale: i32,
+    BUFR_ReferenceValue: i32,
     BUFR_DataWidth_Bits: u16,
     //    CREX_Unit: String,
     //    CREX_Scale: i8,
     //    CREX_DataWidth_Char: u8,
-    Status: String,
+    Status: String, // Operation: String
 }
 
 #[allow(non_snake_case)]
@@ -39,8 +41,51 @@ pub struct RecordF3 {
     Status: String,
 }
 
-pub type TableF0 = HashMap<(u8, u8), RecordF0>;
+pub type TableF0 = HashMap<(u8, u8), ElementDescriptor>;
 pub type TableF3 = HashMap<(u8, u8), Vec<RecordF3>>;
+
+use crate::BUFRUnit;
+
+impl std::str::FromStr for BUFRUnit {
+    type Err = crate::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(match s {
+            "CodeTable" => BUFRUnit::CodeTable,
+            "Numeric" => BUFRUnit::Numeric,
+            "a" => BUFRUnit::Year,
+            "d" => BUFRUnit::Day,
+            "m/s" => BUFRUnit::MeterPerSecond,
+            "CCITT IA5" => BUFRUnit::CCITTIA5,
+            "Degree true" => BUFRUnit::DegreeTrue,
+            "Code table defined by originating/generating centre" => BUFRUnit::CodeTableOriginator,
+            "h" => BUFRUnit::Hour,
+            "min" => BUFRUnit::Minute,
+            "m" => BUFRUnit::Meter,
+            "mon" => BUFRUnit::Month,
+            "s" => BUFRUnit::Second,
+            "deg" => BUFRUnit::Degree,
+            "Common Code table C-1" => BUFRUnit::CC1,
+            "Common Code table C-12" => BUFRUnit::CC12,
+            "Common Code table C-11" => BUFRUnit::CC11,
+            _ => return Err(crate::Error::TruncatedMessage), // FIXME
+        })
+    }
+}
+
+impl From<RecordF0> for ElementDescriptor {
+    fn from(v: RecordF0) -> Self {
+        let unit = v.BUFR_Unit.parse().expect("Unknown unit");
+
+        Self {
+            name: v.ElementName_en,
+            unit,
+            scale: v.BUFR_Scale,
+            reference_value: v.BUFR_ReferenceValue,
+            data_width: v.BUFR_DataWidth_Bits,
+        }
+    }
+}
 
 pub fn load_table_f0<P: AsRef<Path>>(filename: P) -> TableF0 {
     let path = filename.as_ref();
@@ -55,7 +100,7 @@ pub fn load_table_f0<P: AsRef<Path>>(filename: P) -> TableF0 {
         //let f: u8 = record.FXY.get(0..1).expect("").parse().expect("");
         let x: u8 = record.FXY.get(1..=2).expect("").parse().expect("");
         let y: u8 = record.FXY.get(3..).expect("").parse().expect("");
-        table.insert((x, y), record);
+        table.insert((x, y), record.into());
     }
     table
 }
@@ -86,6 +131,7 @@ pub fn load_table_f3<P: AsRef<Path>>(filename: P) -> TableF3 {
 #[cfg(test)]
 mod tests {
     use super::{load_table_f0, load_table_f3};
+    use crate::{BUFRUnit, ElementDescriptor, Error};
 
     use std::path::PathBuf;
 
@@ -95,7 +141,21 @@ mod tests {
         filename.push("tables/BUFRCREX_TableB_en_01.csv");
 
         let table = load_table_f0(filename);
-        assert_eq!(table.get(&(1, 154)).unwrap().BUFR_DataWidth_Bits, 12u16);
+        //        assert_eq!(table.get(&(1, 154)).unwrap().BUFR_DataWidth_Bits, 12u16);
+    }
+
+    #[test]
+    fn validate_load_f0() {
+        let mut filename = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        filename.push("tables/BUFRCREX_TableB_en_01.csv");
+
+        let table = load_table_f0(filename);
+        for ((x, y), v) in table.into_iter() {
+            if let Ok(ans) = element_descriptor_f0(x, y) {
+                //                assert_eq!(v.BUFR_DataWidth_Bits, ans.data_width);
+                assert_eq!(v, ans);
+            }
+        }
     }
 
     #[test]
@@ -117,5 +177,140 @@ mod tests {
                 String::from("001005")
             ]
         );
+    }
+
+    // Testing WIP
+    // F=0
+    fn element_descriptor_f0(x: u8, y: u8) -> Result<ElementDescriptor, Error> {
+        let element = match (x, y) {
+            (1, 19) => ElementDescriptor {
+                name: String::from("Long station or site name"),
+                unit: BUFRUnit::CCITTIA5,
+                scale: 0,
+                reference_value: 0,
+                data_width: 256,
+            },
+            (1, 36) => ElementDescriptor {
+                name: String::from("Agency in charge of operating the observing platform"),
+                unit: BUFRUnit::CodeTable,
+                scale: 0,
+                reference_value: 0,
+                data_width: 20,
+            },
+            (1, 85) => ElementDescriptor {
+                name: String::from("Observing platform manufacturer's model"),
+                unit: BUFRUnit::CCITTIA5,
+                scale: 0,
+                reference_value: 0,
+                data_width: 160,
+            },
+            (1, 86) => ElementDescriptor {
+                name: String::from("Observing platform manufacturer's serial number"),
+                unit: BUFRUnit::CCITTIA5,
+                scale: 0,
+                reference_value: 0,
+                data_width: 256,
+            },
+            (1, 87) => ElementDescriptor {
+                name: String::from("WMO marine observing platform extended identifier"),
+                unit: BUFRUnit::Numeric,
+                scale: 0,
+                reference_value: 0,
+                data_width: 23,
+            },
+            (1, 125) => ElementDescriptor {
+                name: String::from("WIGOS identifier series"),
+                unit: BUFRUnit::Numeric,
+                scale: 0,
+                reference_value: 0,
+                data_width: 4,
+            },
+            (1, 126) => ElementDescriptor {
+                name: String::from("WIGOS issuer of identifier"),
+                unit: BUFRUnit::Numeric,
+                scale: 0,
+                reference_value: 0,
+                data_width: 16,
+            },
+            (1, 127) => ElementDescriptor {
+                name: String::from("WIGOS issue number"),
+                unit: BUFRUnit::Numeric,
+                scale: 0,
+                reference_value: 0,
+                data_width: 16,
+            },
+            (1, 128) => ElementDescriptor {
+                name: String::from("WIGOS local identifier (character)"),
+                unit: BUFRUnit::CCITTIA5,
+                scale: 0,
+                reference_value: 0,
+                data_width: 128,
+            },
+            (4, 1) => ElementDescriptor {
+                name: String::from("Year"),
+                unit: BUFRUnit::Year,
+                scale: 0,
+                reference_value: 0,
+                data_width: 12,
+            },
+            (4, 2) => ElementDescriptor {
+                name: String::from("Month"),
+                unit: BUFRUnit::Month,
+                scale: 0,
+                reference_value: 0,
+                data_width: 4,
+            },
+            (4, 3) => ElementDescriptor {
+                name: String::from("Day"),
+                unit: BUFRUnit::Day,
+                scale: 0,
+                reference_value: 0,
+                data_width: 6,
+            },
+            (4, 4) => ElementDescriptor {
+                name: String::from("Hour"),
+                unit: BUFRUnit::Hour,
+                scale: 0,
+                reference_value: 0,
+                data_width: 5,
+            },
+            (4, 5) => ElementDescriptor {
+                name: String::from("Minute"),
+                unit: BUFRUnit::Minute,
+                scale: 0,
+                reference_value: 0,
+                data_width: 6,
+            },
+            (4, 6) => ElementDescriptor {
+                name: String::from("Second"),
+                unit: BUFRUnit::Second,
+                scale: 0,
+                reference_value: 0,
+                data_width: 6,
+            },
+            (5, 1) => ElementDescriptor {
+                name: String::from("Latitude (high accuracy)"),
+                unit: BUFRUnit::Degree,
+                scale: 5,
+                reference_value: -9000000,
+                data_width: 25,
+            },
+            (6, 1) => ElementDescriptor {
+                name: String::from("Longitude (high accuracy)"),
+                unit: BUFRUnit::Degree,
+                scale: 5,
+                reference_value: -18000000,
+                data_width: 26,
+            },
+            (8, 21) => ElementDescriptor {
+                name: String::from("Time significance"),
+                unit: BUFRUnit::CodeTable,
+                scale: 0,
+                reference_value: 0,
+                data_width: 5,
+            },
+            _ => return Err(Error::TruncatedMessage), // FIXME
+        };
+        Ok(element)
     }
 }

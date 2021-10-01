@@ -442,9 +442,9 @@ impl Section3 {
         })?;
         let mut n: usize = 0;
         for fxy in &self.descriptors {
-            n += fxy.encode(wtr).unwrap();
+            n += fxy.encode(wtr)?;
         }
-        Ok(1)
+        Ok(7 + n)
     }
 
     pub fn length(&self) -> usize {
@@ -803,21 +803,30 @@ fn width_value_from_table(x: u8, y: u8) -> usize {
     }
 }
 
+#[derive(Debug, PartialEq)]
 enum BUFRUnit {
     Numeric,
     CodeTable,
     CCITTIA5,
-    a,
-    mon,
-    d,
-    h,
-    min,
-    s,
-    deg,
+    Year,           // a
+    Month,          // mon
+    Day,            // d
+    Hour,           // h
+    Minute,         // min
+    Second,         // s
+    Degree,         // deg
+    MeterPerSecond, // m/s
+    DegreeTrue,
+    CC1,
+    CC12,
+    CC11,
+    CodeTableOriginator,
+    Meter,
 }
 
 // scale: The power of 10 by which the element has been multiplied prior to encoding.
 // reference: A number to be subtracted from the element, after scaling (if any), and prior to encoding.
+#[derive(Debug, PartialEq)]
 struct ElementDescriptor {
     name: String,
     unit: BUFRUnit,
@@ -826,140 +835,6 @@ struct ElementDescriptor {
     data_width: u16,
 }
 
-// Testing WIP
-// F=0
-fn element_descriptor(x: u8, y: u8) -> Result<ElementDescriptor, Error> {
-    let element = match (x, y) {
-        (1, 19) => ElementDescriptor {
-            name: String::from("Long station or site name"),
-            unit: BUFRUnit::CCITTIA5,
-            scale: 0,
-            reference_value: 0,
-            data_width: 256,
-        },
-        (1, 36) => ElementDescriptor {
-            name: String::from("Agency in charge of operating the observing platform"),
-            unit: BUFRUnit::CodeTable,
-            scale: 0,
-            reference_value: 0,
-            data_width: 20,
-        },
-        (1, 85) => ElementDescriptor {
-            name: String::from("Observing platform manufacturer's model"),
-            unit: BUFRUnit::CCITTIA5,
-            scale: 0,
-            reference_value: 0,
-            data_width: 160,
-        },
-        (1, 86) => ElementDescriptor {
-            name: String::from("Observing platform manufacturer's serial number"),
-            unit: BUFRUnit::CCITTIA5,
-            scale: 0,
-            reference_value: 0,
-            data_width: 256,
-        },
-        (1, 87) => ElementDescriptor {
-            name: String::from("WMO marine observing platform extended identifier"),
-            unit: BUFRUnit::Numeric,
-            scale: 0,
-            reference_value: 0,
-            data_width: 23,
-        },
-        (1, 125) => ElementDescriptor {
-            name: String::from("WIGOS identifier series"),
-            unit: BUFRUnit::Numeric,
-            scale: 0,
-            reference_value: 0,
-            data_width: 4,
-        },
-        (1, 126) => ElementDescriptor {
-            name: String::from("WIGOS issuer of identifier"),
-            unit: BUFRUnit::Numeric,
-            scale: 0,
-            reference_value: 0,
-            data_width: 16,
-        },
-        (1, 127) => ElementDescriptor {
-            name: String::from("WIGOS issue number"),
-            unit: BUFRUnit::Numeric,
-            scale: 0,
-            reference_value: 0,
-            data_width: 16,
-        },
-        (1, 128) => ElementDescriptor {
-            name: String::from("WIGOS local identifier (character)"),
-            unit: BUFRUnit::CCITTIA5,
-            scale: 0,
-            reference_value: 0,
-            data_width: 128,
-        },
-        (4, 1) => ElementDescriptor {
-            name: String::from("Year"),
-            unit: BUFRUnit::a,
-            scale: 0,
-            reference_value: 0,
-            data_width: 12,
-        },
-        (4, 2) => ElementDescriptor {
-            name: String::from("Month"),
-            unit: BUFRUnit::mon,
-            scale: 0,
-            reference_value: 0,
-            data_width: 4,
-        },
-        (4, 3) => ElementDescriptor {
-            name: String::from("Day"),
-            unit: BUFRUnit::d,
-            scale: 0,
-            reference_value: 0,
-            data_width: 6,
-        },
-        (4, 4) => ElementDescriptor {
-            name: String::from("Hour"),
-            unit: BUFRUnit::h,
-            scale: 0,
-            reference_value: 0,
-            data_width: 5,
-        },
-        (4, 5) => ElementDescriptor {
-            name: String::from("Minute"),
-            unit: BUFRUnit::min,
-            scale: 0,
-            reference_value: 0,
-            data_width: 6,
-        },
-        (4, 6) => ElementDescriptor {
-            name: String::from("Second"),
-            unit: BUFRUnit::s,
-            scale: 0,
-            reference_value: 0,
-            data_width: 6,
-        },
-        (5, 1) => ElementDescriptor {
-            name: String::from("Latitude (high accuracy)"),
-            unit: BUFRUnit::deg,
-            scale: 5,
-            reference_value: -9000000,
-            data_width: 25,
-        },
-        (6, 1) => ElementDescriptor {
-            name: String::from("Longitude (high accuracy)"),
-            unit: BUFRUnit::deg,
-            scale: 5,
-            reference_value: -18000000,
-            data_width: 26,
-        },
-        (8, 21) => ElementDescriptor {
-            name: String::from("Time significance"),
-            unit: BUFRUnit::CodeTable,
-            scale: 0,
-            reference_value: 0,
-            data_width: 5,
-        },
-        _ => unimplemented!(),
-    };
-    Ok(element)
-}
 // Testing WIP
 // Expand a sequence descriptor, i.e. F=3.
 // Note that it can contain another F=3
