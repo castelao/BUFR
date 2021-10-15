@@ -51,13 +51,13 @@ impl std::str::FromStr for BUFRUnit {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Ok(match s {
-            "CodeTable" => BUFRUnit::CodeTable,
+            "Code table" => BUFRUnit::CodeTable,
             "Numeric" => BUFRUnit::Numeric,
             "a" => BUFRUnit::Year,
             "d" => BUFRUnit::Day,
             "m/s" => BUFRUnit::MeterPerSecond,
             "CCITT IA5" => BUFRUnit::CCITTIA5,
-            "Degree true" => BUFRUnit::DegreeTrue,
+            "degree true" => BUFRUnit::DegreeTrue,
             "Code table defined by originating/generating centre" => BUFRUnit::CodeTableOriginator,
             "h" => BUFRUnit::Hour,
             "min" => BUFRUnit::Minute,
@@ -68,7 +68,7 @@ impl std::str::FromStr for BUFRUnit {
             "Common Code table C-1" => BUFRUnit::CC1,
             "Common Code table C-12" => BUFRUnit::CC12,
             "Common Code table C-11" => BUFRUnit::CC11,
-            _ => return Err(crate::Error::TruncatedMessage), // FIXME
+            _ => unimplemented!("Unrecognized unit: {}", s),
         })
     }
 }
