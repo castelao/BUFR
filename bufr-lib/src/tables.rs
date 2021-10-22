@@ -1,12 +1,43 @@
 use std::collections::HashMap;
+use std::convert::TryFrom;
 use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
 use std::path::PathBuf;
+use std::str::FromStr;
 
+use once_cell::sync::Lazy;
 use serde::Deserialize;
 
 use crate::ElementDescriptor;
+
+pub type TableF0 = HashMap<(u8, u8), ElementDescriptor>;
+pub type TableF3 = HashMap<(u8, u8), Vec<F3>>;
+
+static TABLE_F0: Lazy<TableF0> = Lazy::new(|| {
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_01.csv");
+    parse_table_f0(&data[..])
+});
+
+pub enum Descriptor {
+    Element(u8, u8),           // F0
+    Replication(u8, u8),       // F1
+    Operator(u8, u8),          // F2
+    Sequence(Vec<Descriptor>), // F3
+}
+
+impl TryFrom<Descriptor> for &ElementDescriptor {
+    type Error = crate::Error;
+
+    fn try_from(value: Descriptor) -> Result<Self, Self::Error> {
+        match value {
+            Descriptor::Element(x, y) => Ok(&TABLE_F0[&(x, y)]),
+            _ => unimplemented!(),
+        }
+    }
+}
+
+//Descriptor::Element()
 
 #[allow(non_snake_case)]
 #[derive(Debug, Deserialize)]
@@ -41,8 +72,10 @@ pub struct RecordF3 {
     Status: String,
 }
 
-pub type TableF0 = HashMap<(u8, u8), ElementDescriptor>;
-pub type TableF3 = HashMap<(u8, u8), Vec<RecordF3>>;
+pub struct F3 {
+    fxy2: Descriptor,
+    title: Option<String>,
+}
 
 use crate::BUFRUnit;
 
@@ -91,7 +124,10 @@ pub fn load_table_f0<P: AsRef<Path>>(filename: P) -> TableF0 {
     let path = filename.as_ref();
     let file = File::open(path).expect(&format!("Error loading file: {:?}", path));
     let reader = BufReader::new(file);
+    parse_table_f0(reader)
+}
 
+pub fn parse_table_f0<R: std::io::Read>(reader: R) -> TableF0 {
     let mut table = TableF0::default();
 
     let mut rdr = csv::Reader::from_reader(reader);
@@ -122,15 +158,42 @@ pub fn load_table_f3<P: AsRef<Path>>(filename: P) -> TableF3 {
         //table.insert((f, x, y), record);
         table
             .entry((x, y))
-            .and_modify(|v| v.push(record.clone()))
-            .or_insert(vec![record]);
+            .and_modify(|v| v.push(record.clone().into()))
+            .or_insert(vec![record.into()]);
     }
     table
 }
 
+impl From<RecordF3> for F3 {
+    fn from(v: RecordF3) -> Self {
+        Self {
+            fxy2: v.FXY2.parse().unwrap(),
+            title: v.Title_en,
+        }
+    }
+}
+
+impl FromStr for Descriptor {
+    type Err = crate::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        // FIXME Continue from here
+        /*
+        let f: u8 = record.FXY1.get(0..1).expect("").parse().expect("");
+        let x: u8 = record.FXY1.get(1..=2).expect("").parse().expect("");
+        let y: u8 = record.FXY1.get(3..).expect("").parse().expect("");
+
+        match f {
+          0 => Descriptor::Element,
+          3 => Descriptor::Sequence,
+        */
+        unimplemented!()
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use super::{load_table_f0, load_table_f3};
+    use super::{load_table_f0, load_table_f3, TABLE_F0};
     use crate::{BUFRUnit, ElementDescriptor, Error};
 
     use std::path::PathBuf;
@@ -154,6 +217,16 @@ mod tests {
             if let Ok(ans) = element_descriptor_f0(x, y) {
                 //                assert_eq!(v.BUFR_DataWidth_Bits, ans.data_width);
                 assert_eq!(v, ans);
+            }
+        }
+    }
+
+    #[test]
+    fn validate_static_f0() {
+        for ((x, y), v) in TABLE_F0.iter() {
+            if let Ok(ans) = element_descriptor_f0(*x, *y) {
+                //                assert_eq!(v.BUFR_DataWidth_Bits, ans.data_width);
+                assert_eq!(v, &ans);
             }
         }
     }
