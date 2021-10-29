@@ -12,18 +12,29 @@ use serde::Deserialize;
 use crate::ElementDescriptor;
 
 pub type TableF0 = HashMap<(u8, u8), ElementDescriptor>;
-pub type TableF3 = HashMap<(u8, u8), Vec<F3>>;
+pub type TableF3 = HashMap<(u8, u8), F3>;
 
 static TABLE_F0: Lazy<TableF0> = Lazy::new(|| {
     let data = include_bytes!("../tables/BUFRCREX_TableB_en_01.csv");
     parse_table_f0(&data[..])
 });
 
+static TABLE_F3: Lazy<TableF3> = Lazy::new(|| {
+    let data = include_bytes!("../tables/BUFR_TableD_en_01.csv");
+    parse_table_f3(&data[..])
+});
+
+#[derive(PartialEq, Debug)]
 pub enum Descriptor {
-    Element(u8, u8),           // F0
-    Replication(u8, u8),       // F1
-    Operator(u8, u8),          // F2
-    Sequence(Vec<Descriptor>), // F3
+    Element(u8, u8),     // F0
+    Replication(u8, u8), // F1
+    Operator(u8, u8),    // F2
+    Sequence(u8, u8),    // F3
+}
+
+struct F3 {
+    descriptors: Vec<Descriptor>,
+    title: Option<String>,
 }
 
 impl TryFrom<Descriptor> for &ElementDescriptor {
@@ -72,9 +83,10 @@ pub struct RecordF3 {
     Status: String,
 }
 
-pub struct F3 {
-    fxy2: Descriptor,
-    title: Option<String>,
+impl F3 {
+    fn len(&self) -> usize {
+        self.descriptors.len()
+    }
 }
 
 use crate::BUFRUnit;
@@ -145,7 +157,10 @@ pub fn load_table_f3<P: AsRef<Path>>(filename: P) -> TableF3 {
     let path = filename.as_ref();
     let file = File::open(path).expect(&format!("Error loading file: {:?}", path));
     let reader = BufReader::new(file);
+    parse_table_f3(reader)
+}
 
+pub fn parse_table_f3<R: std::io::Read>(reader: R) -> TableF3 {
     let mut table = TableF3::default();
 
     let mut rdr = csv::Reader::from_reader(reader);
@@ -155,45 +170,45 @@ pub fn load_table_f3<P: AsRef<Path>>(filename: P) -> TableF3 {
         assert_eq!(f, 3);
         let x: u8 = record.FXY1.get(1..=2).expect("").parse().expect("");
         let y: u8 = record.FXY1.get(3..).expect("").parse().expect("");
-        //table.insert((f, x, y), record);
         table
             .entry((x, y))
-            .and_modify(|v| v.push(record.clone().into()))
-            .or_insert(vec![record.into()]);
+            .and_modify(|v| {
+                // TODO:
+                // - verify that v.title is a superset of record.Title_en
+                // - only warn, not assert
+                //assert_eq!(record.Title_en, v.title);
+                v.descriptors.push(record.clone().into())
+            })
+            .or_insert({
+                let title = record.Title_en.clone();
+                F3 {
+                    descriptors: vec![record.into()],
+                    title,
+                }
+            });
     }
     table
 }
 
-impl From<RecordF3> for F3 {
-    fn from(v: RecordF3) -> Self {
-        Self {
-            fxy2: v.FXY2.parse().unwrap(),
-            title: v.Title_en,
-        }
-    }
-}
-
-impl FromStr for Descriptor {
-    type Err = crate::Error;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        // FIXME Continue from here
-        /*
-        let f: u8 = record.FXY1.get(0..1).expect("").parse().expect("");
-        let x: u8 = record.FXY1.get(1..=2).expect("").parse().expect("");
-        let y: u8 = record.FXY1.get(3..).expect("").parse().expect("");
+impl From<RecordF3> for Descriptor {
+    fn from(record: RecordF3) -> Self {
+        let f: u8 = record.FXY2.get(0..1).expect("").parse().expect("");
+        let x: u8 = record.FXY2.get(1..=2).expect("").parse().expect("");
+        let y: u8 = record.FXY2.get(3..).expect("").parse().expect("");
 
         match f {
-          0 => Descriptor::Element,
-          3 => Descriptor::Sequence,
-        */
-        unimplemented!()
+            0 => Descriptor::Element(x, y),
+            1 => Descriptor::Replication(x, y),
+            2 => Descriptor::Operator(x, y),
+            3 => Descriptor::Sequence(x, y),
+            _ => unimplemented!("Unknown f: {}", f),
+        }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{load_table_f0, load_table_f3, TABLE_F0};
+    use super::{load_table_f0, load_table_f3, Descriptor, TABLE_F0, TABLE_F3};
     use crate::{BUFRUnit, ElementDescriptor, Error};
 
     use std::path::PathBuf;
@@ -240,14 +255,11 @@ mod tests {
         let record = table.get(&(1, 2)).unwrap();
         assert_eq!(record.len(), 3);
         assert_eq!(
-            record
-                .into_iter()
-                .map(|r| r.FXY2.clone())
-                .collect::<Vec<_>>(),
+            record.descriptors,
             vec![
-                String::from("001003"),
-                String::from("001004"),
-                String::from("001005")
+                Descriptor::Element(1, 3),
+                Descriptor::Element(1, 4),
+                Descriptor::Element(1, 5),
             ]
         );
     }
