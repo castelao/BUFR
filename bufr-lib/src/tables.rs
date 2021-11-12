@@ -12,15 +12,15 @@ use serde::Deserialize;
 
 use crate::ElementDescriptor;
 
-pub type TableF0 = HashMap<(u8, u8), ElementDescriptor>;
-pub type TableF3 = HashMap<(u8, u8), F3>;
+pub(crate) type TableF0 = HashMap<(u8, u8), ElementDescriptor>;
+pub(crate) type TableF3 = HashMap<(u8, u8), F3>;
 
-static TABLE_F0: Lazy<TableF0> = Lazy::new(|| {
+pub(crate) static TABLE_F0: Lazy<TableF0> = Lazy::new(|| {
     let data = include_bytes!("../tables/BUFRCREX_TableB_en_01.csv");
     parse_table_f0(&data[..])
 });
 
-static TABLE_F3: Lazy<TableF3> = Lazy::new(|| {
+pub(crate) static TABLE_F3: Lazy<TableF3> = Lazy::new(|| {
     let data = include_bytes!("../tables/BUFR_TableD_en_01.csv");
     parse_table_f3(&data[..])
 });
@@ -146,14 +146,14 @@ impl From<RecordF0> for ElementDescriptor {
     }
 }
 
-pub fn load_table_f0<P: AsRef<Path>>(filename: P) -> TableF0 {
+fn load_table_f0<P: AsRef<Path>>(filename: P) -> TableF0 {
     let path = filename.as_ref();
     let file = File::open(path).expect(&format!("Error loading file: {:?}", path));
     let reader = BufReader::new(file);
     parse_table_f0(reader)
 }
 
-pub fn parse_table_f0<R: std::io::Read>(reader: R) -> TableF0 {
+fn parse_table_f0<R: std::io::Read>(reader: R) -> TableF0 {
     let mut table = TableF0::default();
 
     let mut rdr = csv::Reader::from_reader(reader);
@@ -167,14 +167,14 @@ pub fn parse_table_f0<R: std::io::Read>(reader: R) -> TableF0 {
     table
 }
 
-pub fn load_table_f3<P: AsRef<Path>>(filename: P) -> TableF3 {
+fn load_table_f3<P: AsRef<Path>>(filename: P) -> TableF3 {
     let path = filename.as_ref();
     let file = File::open(path).expect(&format!("Error loading file: {:?}", path));
     let reader = BufReader::new(file);
     parse_table_f3(reader)
 }
 
-pub fn parse_table_f3<R: std::io::Read>(reader: R) -> TableF3 {
+fn parse_table_f3<R: std::io::Read>(reader: R) -> TableF3 {
     let mut table = TableF3::default();
 
     let mut rdr = csv::Reader::from_reader(reader);
