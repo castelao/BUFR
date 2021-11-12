@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::convert::TryFrom;
+use std::fmt;
 use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
@@ -32,7 +33,20 @@ pub enum Descriptor {
     Sequence(u8, u8),    // F3
 }
 
-struct F3 {
+impl fmt::Display for Descriptor {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let (fd, x, y) = match *self {
+            Descriptor::Element(x, y) => (0, x, y),
+            Descriptor::Replication(x, y) => (1, x, y),
+            Descriptor::Operator(x, y) => (2, x, y),
+            Descriptor::Sequence(x, y) => (3, x, y),
+        };
+        write!(f, "Descriptor {{ f: {}, x: {}, y: {} }}", fd, x, y)
+    }
+}
+
+#[derive(PartialEq, Debug)]
+pub(crate) struct F3 {
     descriptors: Vec<Descriptor>,
     title: Option<String>,
 }
