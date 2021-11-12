@@ -51,6 +51,22 @@ pub(crate) struct F3 {
     title: Option<String>,
 }
 
+impl F3 {
+    pub(crate) fn iter(&self) -> impl Iterator<Item = &Descriptor> {
+        self.descriptors.iter()
+    }
+}
+
+/*
+impl Iterator for F3 {
+    type Item = Descriptor;
+
+    fn next(&mut self) -> Option<Self::Item> {
+
+    }
+}
+*/
+
 impl TryFrom<Descriptor> for &ElementDescriptor {
     type Error = crate::Error;
 
