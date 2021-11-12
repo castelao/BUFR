@@ -10,6 +10,8 @@ use std::fmt;
 use byteorder::{BigEndian, WriteBytesExt};
 use getset::{CopyGetters, Getters};
 
+use crate::tables::TABLE_F3;
+
 /// Possible errors when parsing BUFR messages
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
@@ -373,6 +375,15 @@ impl fmt::Display for Section3 {
                 }
                 // n = if d.y == 0 { d.x + 1 } else { d.x };
                 ident.extend("    ".chars());
+            } else if d.f == 3 {
+                writeln!(f, "{}{:?}", ident, d)?;
+
+                let child = TABLE_F3
+                    .get(&(d.x, d.y))
+                    .expect("Failed to get item from F3 table");
+                for c in child.iter() {
+                    writeln!(f, "{} |_ {}", ident, c)?;
+                }
             } else {
                 writeln!(f, "{}{:?}", ident, d)?;
             };
