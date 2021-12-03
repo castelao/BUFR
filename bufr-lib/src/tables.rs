@@ -21,8 +21,18 @@ pub(crate) static TABLE_F0: Lazy<TableF0> = Lazy::new(|| {
 });
 
 pub(crate) static TABLE_F3: Lazy<TableF3> = Lazy::new(|| {
+    let mut table = TableF3::default();
+
+    // FIXME: 18, 21, 22, 40
+    //    for n in 0..16 {
     let data = include_bytes!("../tables/BUFR_TableD_en_01.csv");
-    parse_table_f3(&data[..])
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_15.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+    table
 });
 
 #[derive(PartialEq, Debug)]
@@ -244,15 +254,6 @@ mod tests {
     use std::path::PathBuf;
 
     #[test]
-    fn test_load_f0() {
-        let mut filename = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-        filename.push("tables/BUFRCREX_TableB_en_01.csv");
-
-        let table = load_table_f0(filename);
-        //        assert_eq!(table.get(&(1, 154)).unwrap().BUFR_DataWidth_Bits, 12u16);
-    }
-
-    #[test]
     fn validate_load_f0() {
         let mut filename = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
         filename.push("tables/BUFRCREX_TableB_en_01.csv");
@@ -260,7 +261,6 @@ mod tests {
         let table = load_table_f0(filename);
         for ((x, y), v) in table.into_iter() {
             if let Ok(ans) = element_descriptor_f0(x, y) {
-                //                assert_eq!(v.BUFR_DataWidth_Bits, ans.data_width);
                 assert_eq!(v, ans);
             }
         }
@@ -270,19 +270,32 @@ mod tests {
     fn validate_static_f0() {
         for ((x, y), v) in TABLE_F0.iter() {
             if let Ok(ans) = element_descriptor_f0(*x, *y) {
-                //                assert_eq!(v.BUFR_DataWidth_Bits, ans.data_width);
                 assert_eq!(v, &ans);
             }
         }
     }
 
     #[test]
-    fn test_load_f3() {
+    fn validate_load_f3() {
         let mut filename = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
         filename.push("tables/BUFR_TableD_en_01.csv");
 
         let table = load_table_f3(filename);
         let record = table.get(&(1, 2)).unwrap();
+        assert_eq!(record.len(), 3);
+        assert_eq!(
+            record.descriptors,
+            vec![
+                Descriptor::Element(1, 3),
+                Descriptor::Element(1, 4),
+                Descriptor::Element(1, 5),
+            ]
+        );
+    }
+
+    #[test]
+    fn validate_static_f3() {
+        let record = TABLE_F3.get(&(1, 2)).unwrap();
         assert_eq!(record.len(), 3);
         assert_eq!(
             record.descriptors,
