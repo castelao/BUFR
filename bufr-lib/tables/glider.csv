@@ -1,3 +1,4 @@
+Category,CategoryOfSequences_en,FXY1,Title_en,SubTitle_en,FXY2,ElementName_en,ElementDescription_en,Note_en,Status
 15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,301150,WIGOS identifier,,,Operational
 15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,001087,WMO marine observing platform extended identifier,,,Operational
 15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,001019,Long station or site name,,,Operational
@@ -10,10 +11,10 @@
 15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,301013,"Hour, minute, second",,,Operational
 15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,301021,Latitude/longitude (high accuracy),,,Operational
 15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,011104,"True heading of aircraft, ship or other mobile platform",,,Operational
-15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,012169,Anemometer type,Set to 2, wind observation through ambient noise (WOTAN),,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,012169,Anemometer type,"Set to 2, wind observation through ambient noise (WOTAN)",,Operational
 15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,011002,Wind speed,,,Operational
 15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,011001,Wind direction,,,Operational
-15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,002169,Anemometer type,Set to missing / cancel previous value,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,002169,Anemometer type,Set to missing / cancel previous value,,Operational
 15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,022032,Speed of sea-surface current,,,Operational
 15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,022005,Direction of sea-surface current,,,Operational
 15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),Time/date of last known position,008021,Time significance,#ERROR!,,Operational

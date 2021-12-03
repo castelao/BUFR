@@ -32,6 +32,11 @@ pub(crate) static TABLE_F3: Lazy<TableF3> = Lazy::new(|| {
     let data = include_bytes!("../tables/BUFR_TableD_en_15.csv");
     let new_table = parse_table_f3(&data[..]);
     table.extend(new_table);
+
+    let data = include_bytes!("../tables/glider.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
     table
 });
 
