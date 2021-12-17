@@ -9,6 +9,10 @@ struct Dump {
     /// File containing a BUFR message to be dumped
     #[structopt(parse(from_os_str))]
     message: PathBuf,
+
+    /// Print raw data for section 4
+    #[structopt(long = "show-data")]
+    show_data: bool,
 }
 
 fn main() -> Result<()> {
@@ -20,6 +24,12 @@ fn main() -> Result<()> {
     reader.read_to_end(&mut buffer)?;
 
     let data = bufr::decode(&buffer[..])?;
+
+    if args.show_data {
+        println!("{:?}", data);
+    } else {
+        println!("{}", data);
+    }
 
     println!("{}", data);
 

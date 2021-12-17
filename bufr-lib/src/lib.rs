@@ -52,7 +52,6 @@ pub enum Error {
 }
 
 /// A parsed BUFR message
-#[derive(Debug)]
 pub struct Message {
     total_length: u32,
     version: u8,
@@ -62,6 +61,17 @@ pub struct Message {
 }
 
 impl fmt::Display for Message {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        writeln!(f, "BUFR version {}", self.version)?;
+        writeln!(f, "     total length: {}", self.total_length)?;
+        writeln!(f, "")?;
+        writeln!(f, "{}", self.section1)?;
+        writeln!(f, "")?;
+        writeln!(f, "{}", self.section3)
+    }
+}
+
+impl fmt::Debug for Message {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         writeln!(f, "BUFR version {}", self.version)?;
         writeln!(f, "     total length: {}", self.total_length)?;
