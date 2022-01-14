@@ -857,7 +857,6 @@ enum Values {
 }
 */
 
-type BitOffset = usize;
 /*
 magic(0-04-001, 001001100110_0111011) -> Values
 0-04-001 = Year (scale=0, reference=0, DataWidth=12, BUFR_Unit=a)
@@ -866,46 +865,23 @@ Next test cases:
 1111_0000
 1111_1111_1111_0000
 */
-fn magic(descriptor: &ElementDescriptor, buffer: &[u8], skip: BitOffset) -> (Vec<u8>, BitOffset) {
-    assert!(buffer.len() * 8 >= descriptor.data_width as usize + skip);
-
-    let mut data_width = descriptor.data_width as usize / 8;
-    if descriptor.data_width % 8 != 0 {
-        data_width += 1
-    }
-
-    let mut value: Vec<_> = buffer[0..data_width].into();
-    value[0] <<= skip;
-    value[0] >>= descriptor.data_width % 8;
-
-    (value, descriptor.data_width as usize + skip)
-}
 
 #[cfg(test)]
 mod test_magic {
-    use super::{magic, tables::TABLE_F0};
-
-    /*
-    #[test]
-    fn magic_0() -> Result<(), Box<dyn std::error::Error>> {
-        let descriptor = TABLE_F0.get(&(4, 1)).expect("No descriptor");
-        let buffer = [0, 0];
-        let (value, offset) = magic(descriptor, &buffer[..], 0);
-        assert_eq!(value, 0);
-        assert_eq!(offset, 12);
-
-        unimplemented!()
-    }
-    */
+    use super::{tables::TABLE_F0, BufferReader};
 
     #[test]
     // 0-04-031: width 8, scale 0, reference 0
     fn width8() -> Result<(), Box<dyn std::error::Error>> {
         let descriptor = TABLE_F0.get(&(4, 31)).expect("No descriptor");
         let buffer = [0b0000_1000];
-        let (value, offset) = magic(descriptor, &buffer[..], 0);
+
+        let mut reader = BufferReader::new(&buffer);
+        let value = reader.consume(descriptor.data_width as usize)?;
+
+        //let (value, offset) = magic(descriptor, &buffer[..], 0);
         assert_eq!(value, &[8]);
-        assert_eq!(offset, 8);
+        //assert_eq!(offset, 8);
 
         Ok(())
     }
@@ -916,13 +892,41 @@ mod test_magic {
         let descriptor = TABLE_F0.get(&(4, 2)).expect("No descriptor");
         let buffer = [0b0000_1000];
 
-        let (value, offset) = magic(descriptor, &buffer[..], 0);
+        let mut reader = BufferReader::new(&buffer);
+        let value = reader.consume(descriptor.data_width as usize)?;
         assert_eq!(value, &[0]);
-        assert_eq!(offset, 4);
 
-        let (value, offset) = magic(descriptor, &buffer[..], offset);
+        let value = reader.consume(descriptor.data_width as usize)?;
         assert_eq!(value, &[8]);
-        assert_eq!(offset, 8);
+
+        Ok(())
+    }
+
+    #[test]
+    // 0-04-001: width 12, scale 0, reference 0
+    fn width12() -> Result<(), Box<dyn std::error::Error>> {
+        let descriptor = TABLE_F0.get(&(4, 1)).expect("No descriptor");
+        let buffer = [0b0000_1111, 0b0000_1111];
+
+        let mut reader = BufferReader::new(&buffer);
+        let value = reader.consume(descriptor.data_width as usize)?;
+        assert_eq!(value, &[15, 0]);
+
+        Ok(())
+    }
+
+    #[test]
+    // 0-04-004: width 5, scale 0, reference 0
+    fn width_5x2() -> Result<(), Box<dyn std::error::Error>> {
+        let descriptor = TABLE_F0.get(&(4, 4)).expect("No descriptor");
+        let buffer = [0b0000_1000, 0b0100_1111];
+        let mut reader = BufferReader::new(&buffer);
+
+        let value = reader.consume(descriptor.data_width as usize)?;
+        assert_eq!(value, &[1]);
+
+        let value = reader.consume(descriptor.data_width as usize)?;
+        assert_eq!(value, &[1]);
 
         Ok(())
     }
