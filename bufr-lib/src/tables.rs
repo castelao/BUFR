@@ -16,8 +16,17 @@ pub(crate) type TableF0 = HashMap<(u8, u8), ElementDescriptor>;
 pub(crate) type TableF3 = HashMap<(u8, u8), F3>;
 
 pub(crate) static TABLE_F0: Lazy<TableF0> = Lazy::new(|| {
+    let mut table = TableF0::default();
+
     let data = include_bytes!("../tables/BUFRCREX_TableB_en_01.csv");
-    parse_table_f0(&data[..])
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_04.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    table
 });
 
 pub(crate) static TABLE_F3: Lazy<TableF3> = Lazy::new(|| {
@@ -142,6 +151,7 @@ impl std::str::FromStr for BUFRUnit {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Ok(match s {
             "Code table" => BUFRUnit::CodeTable,
+            "Flag table" => BUFRUnit::FlagTable,
             "Numeric" => BUFRUnit::Numeric,
             "a" => BUFRUnit::Year,
             "d" => BUFRUnit::Day,

@@ -828,6 +828,7 @@ fn width_value_from_table(x: u8, y: u8) -> usize {
 enum BUFRUnit {
     Numeric,
     CodeTable,
+    FlagTable,
     CCITTIA5,
     Year,           // a
     Month,          // mon
@@ -843,6 +844,88 @@ enum BUFRUnit {
     CC11,
     CodeTableOriginator,
     Meter,
+}
+
+/*
+type FieldName = String;
+enum Values {
+    Integer(u32),
+    String(String),
+    Array(Vec<Value>),
+    Float(f64),
+    Map(HashMap<FieldName, Values>),
+}
+*/
+
+type BitOffset = usize;
+/*
+magic(0-04-001, 001001100110_0111011) -> Values
+0-04-001 = Year (scale=0, reference=0, DataWidth=12, BUFR_Unit=a)
+
+Next test cases:
+1111_0000
+1111_1111_1111_0000
+*/
+fn magic(descriptor: &ElementDescriptor, buffer: &[u8], skip: BitOffset) -> (Vec<u8>, BitOffset) {
+    assert!(buffer.len() * 8 >= descriptor.data_width as usize + skip);
+
+    let mut data_width = descriptor.data_width as usize / 8;
+    if descriptor.data_width % 8 != 0 {
+        data_width += 1
+    }
+
+    let mut value: Vec<_> = buffer[0..data_width].into();
+    value[0] <<= skip;
+    value[0] >>= descriptor.data_width % 8;
+
+    (value, descriptor.data_width as usize + skip)
+}
+
+#[cfg(test)]
+mod test_magic {
+    use super::{magic, tables::TABLE_F0};
+
+    /*
+    #[test]
+    fn magic_0() -> Result<(), Box<dyn std::error::Error>> {
+        let descriptor = TABLE_F0.get(&(4, 1)).expect("No descriptor");
+        let buffer = [0, 0];
+        let (value, offset) = magic(descriptor, &buffer[..], 0);
+        assert_eq!(value, 0);
+        assert_eq!(offset, 12);
+
+        unimplemented!()
+    }
+    */
+
+    #[test]
+    // 0-04-031: width 8, scale 0, reference 0
+    fn width8() -> Result<(), Box<dyn std::error::Error>> {
+        let descriptor = TABLE_F0.get(&(4, 31)).expect("No descriptor");
+        let buffer = [0b0000_1000];
+        let (value, offset) = magic(descriptor, &buffer[..], 0);
+        assert_eq!(value, &[8]);
+        assert_eq!(offset, 8);
+
+        Ok(())
+    }
+
+    #[test]
+    // 0-04-002: width 4, scale 0, reference 0
+    fn width4() -> Result<(), Box<dyn std::error::Error>> {
+        let descriptor = TABLE_F0.get(&(4, 2)).expect("No descriptor");
+        let buffer = [0b0000_1000];
+
+        let (value, offset) = magic(descriptor, &buffer[..], 0);
+        assert_eq!(value, &[0]);
+        assert_eq!(offset, 4);
+
+        let (value, offset) = magic(descriptor, &buffer[..], offset);
+        assert_eq!(value, &[8]);
+        assert_eq!(offset, 8);
+
+        Ok(())
+    }
 }
 
 // scale: The power of 10 by which the element has been multiplied prior to encoding.
