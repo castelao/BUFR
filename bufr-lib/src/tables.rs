@@ -4,8 +4,8 @@ use std::fmt;
 use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
-use std::path::PathBuf;
-use std::str::FromStr;
+// use std::path::PathBuf;
+// use std::str::FromStr;
 
 use once_cell::sync::Lazy;
 use serde::Deserialize;
@@ -378,7 +378,7 @@ impl TryFrom<Descriptor> for &ElementDescriptor {
 
 //Descriptor::Element()
 
-#[allow(non_snake_case)]
+#[allow(dead_code, non_snake_case)]
 #[derive(Debug, Deserialize)]
 pub struct RecordF0 {
     ClassNo: String,      // X
@@ -396,7 +396,7 @@ pub struct RecordF0 {
     Status: String, // Operation: String
 }
 
-#[allow(non_snake_case)]
+#[allow(dead_code, non_snake_case)]
 #[derive(Debug, Deserialize, Clone)]
 pub struct RecordF3 {
     Category: String,
@@ -412,6 +412,7 @@ pub struct RecordF3 {
 }
 
 impl F3 {
+    #[allow(dead_code)]
     fn len(&self) -> usize {
         self.descriptors.len()
     }
@@ -474,9 +475,10 @@ impl From<RecordF0> for ElementDescriptor {
     }
 }
 
+#[allow(dead_code)]
 fn load_table_f0<P: AsRef<Path>>(filename: P) -> TableF0 {
     let path = filename.as_ref();
-    let file = File::open(path).expect(&format!("Error loading file: {:?}", path));
+    let file = File::open(path).unwrap_or_else(|_| panic!("Error loading file: {:?}", path));
     let reader = BufReader::new(file);
     parse_table_f0(reader)
 }
@@ -495,9 +497,10 @@ fn parse_table_f0<R: std::io::Read>(reader: R) -> TableF0 {
     table
 }
 
+#[allow(dead_code)]
 fn load_table_f3<P: AsRef<Path>>(filename: P) -> TableF3 {
     let path = filename.as_ref();
-    let file = File::open(path).expect(&format!("Error loading file: {:?}", path));
+    let file = File::open(path).unwrap_or_else(|_| panic!("Error loading file: {:?}", path));
     let reader = BufReader::new(file);
     parse_table_f3(reader)
 }

@@ -64,9 +64,9 @@ impl fmt::Display for Message {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         writeln!(f, "BUFR version {}", self.version)?;
         writeln!(f, "     total length: {}", self.total_length)?;
-        writeln!(f, "")?;
+        writeln!(f, "\n")?;
         writeln!(f, "{}", self.section1)?;
-        writeln!(f, "")?;
+        writeln!(f, "\n")?;
         writeln!(f, "{}", self.section3)
     }
 }
@@ -75,11 +75,11 @@ impl fmt::Debug for Message {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         writeln!(f, "BUFR version {}", self.version)?;
         writeln!(f, "     total length: {}", self.total_length)?;
-        writeln!(f, "")?;
+        writeln!(f, "\n")?;
         writeln!(f, "{}", self.section1)?;
-        writeln!(f, "")?;
+        writeln!(f, "\n")?;
         writeln!(f, "{}", self.section3)?;
-        writeln!(f, "")?;
+        writeln!(f, "\n")?;
         writeln!(f, "{:?}", self.section4)
     }
 }
@@ -102,8 +102,8 @@ impl fmt::Display for Section1 {
 impl Section1 {
     fn decode(buf: &[u8], version: u8) -> Result<Section1, Error> {
         Ok(match version {
-            3 => Section1::V3(Section1v3::decode(&buf[..])?),
-            4 => Section1::V4(Section1v4::decode(&buf[..])?),
+            3 => Section1::V3(Section1v3::decode(buf)?),
+            4 => Section1::V4(Section1v4::decode(buf)?),
             _ => unimplemented!(),
         })
     }
@@ -169,6 +169,7 @@ pub struct Section1v3 {
 }
 
 impl Section1v3 {
+    #[allow(unused_variables)]
     fn decode(buf: &[u8]) -> Result<Section1v3, Error> {
         unimplemented!()
     }
@@ -374,9 +375,9 @@ impl fmt::Display for Section3 {
         writeln!(f, "is compressed: {:?}", self.is_compressed())?;
 
         let mut ident = String::new();
-        ident.extend("    ".chars());
+        ident.push_str("    ");
 
-        let mut n = 0;
+        // let mut n = 0;
         let mut iter = self.descriptors.iter();
         while let Some(d) = iter.next() {
             if d.f == 1 {
@@ -384,7 +385,7 @@ impl fmt::Display for Section3 {
                     writeln!(f, "{}{:?} + {:?}", ident, d, dd)?;
                 }
                 // n = if d.y == 0 { d.x + 1 } else { d.x };
-                ident.extend("    ".chars());
+                ident.push_str("    ");
             } else if d.f == 3 {
                 writeln!(f, "{}{:?}", ident, d)?;
 
@@ -408,7 +409,7 @@ impl Section3 {
             return Err(Error::MessageTooShort);
         }
         let length = (usize::from(buf[0]) << 16) + (usize::from(buf[1]) << 8) + usize::from(buf[2]);
-        if (buf.len() as usize) < length {
+        if buf.len() < length {
             return Err(Error::TruncatedMessage);
         }
         // 4th byte reserved, set to zero
@@ -527,7 +528,7 @@ impl Section4 {
             return Err(Error::MessageTooShort);
         }
         let length = (usize::from(buf[0]) << 16) + (usize::from(buf[1]) << 8) + usize::from(buf[2]);
-        if (buf.len() as usize) < length {
+        if buf.len() < length {
             return Err(Error::TruncatedMessage);
         }
         // 4th byte reserved, set to zero
@@ -771,12 +772,14 @@ struct BufferReader<'a> {
 }
 
 impl<'a> BufferReader<'a> {
+    #[allow(dead_code)]
     fn new(buffer: &'a [u8]) -> Self {
         Self {
             buffer: bitreader::BitReader::new(buffer),
         }
     }
 
+    #[allow(dead_code)]
     /// offset in bits !!!!
     fn consume(&mut self, width: usize) -> Result<Vec<u8>, Error> {
         let chunks = width / 8;
@@ -798,6 +801,7 @@ impl<'a> BufferReader<'a> {
     }
 }
 
+#[allow(dead_code)]
 fn width_value_from_table(x: u8, y: u8) -> usize {
     match (x, y) {
         (1, 27) => 80,
