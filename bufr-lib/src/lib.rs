@@ -844,6 +844,10 @@ enum BUFRUnit {
     CC11,
     CodeTableOriginator,
     Meter,
+    Kelvin,      // K
+    Hertz,       // Hz
+    Kilogram,    // kg
+    SquareMeter, // m^2
 }
 
 /*

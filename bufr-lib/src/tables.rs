@@ -18,11 +18,135 @@ pub(crate) type TableF3 = HashMap<(u8, u8), F3>;
 pub(crate) static TABLE_F0: Lazy<TableF0> = Lazy::new(|| {
     let mut table = TableF0::default();
 
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_00.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
     let data = include_bytes!("../tables/BUFRCREX_TableB_en_01.csv");
     let new_table = parse_table_f0(&data[..]);
     table.extend(new_table);
 
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_02.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_03.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
     let data = include_bytes!("../tables/BUFRCREX_TableB_en_04.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_05.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_06.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_07.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_08.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_10.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_11.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_12.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_13.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_14.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_15.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_19.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_20.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_21.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_22.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_23.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_24.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_25.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_26.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_27.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_28.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_29.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_30.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_31.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_33.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_35.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_40.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_41.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_42.csv");
     let new_table = parse_table_f0(&data[..]);
     table.extend(new_table);
 
@@ -168,6 +292,10 @@ impl std::str::FromStr for BUFRUnit {
             "Common Code table C-1" => BUFRUnit::CC1,
             "Common Code table C-12" => BUFRUnit::CC12,
             "Common Code table C-11" => BUFRUnit::CC11,
+            "K" => BUFRUnit::Kelvin,
+            "Hz" => BUFRUnit::Hertz,
+            "kg" => BUFRUnit::Kilogram,
+            "m2" => BUFRUnit::SquareMeter,
             _ => unimplemented!("Unrecognized unit: {}", s),
         })
     }
