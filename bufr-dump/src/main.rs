@@ -31,7 +31,5 @@ fn main() -> Result<()> {
         println!("{}", data);
     }
 
-    println!("{}", data);
-
     Ok(())
 }
