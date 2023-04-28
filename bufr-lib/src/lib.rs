@@ -848,8 +848,10 @@ enum BUFRUnit {
     Kelvin,                     // K
     Hertz,                      // Hz
     Kilogram,                   // kg
+    KilogramPerLiter,           // kg l-1
     SquareMeter,                // m^2
     CubicMeter,                 // m^3
+    CubicMeterPerSecond,        // m^3
     SquareMeterPerSquareSecond, // m2 s-2
     Pascal,                     // Pa
     Celsius,                    // C
