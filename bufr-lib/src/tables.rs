@@ -172,11 +172,147 @@ pub(crate) static TABLE_F3: Lazy<TableF3> = Lazy::new(|| {
 
     // FIXME: 18, 21, 22, 40
     //    for n in 0..16 {
+    let data = include_bytes!("../tables/BUFR_TableD_en_00.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
     let data = include_bytes!("../tables/BUFR_TableD_en_01.csv");
     let new_table = parse_table_f3(&data[..]);
     table.extend(new_table);
 
+    let data = include_bytes!("../tables/BUFR_TableD_en_02.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_03.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_04.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_05.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_06.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_07.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_08.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_09.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_10.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_11.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_12.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_13.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_14.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
     let data = include_bytes!("../tables/BUFR_TableD_en_15.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_16.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_17.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_18.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_19.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_20.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_21.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_22.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_23.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_24.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_25.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_26.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_27.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_28.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_29.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_30.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_31.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_32.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_33.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_34.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_35.csv");
     let new_table = parse_table_f3(&data[..]);
     table.extend(new_table);
 
