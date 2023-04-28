@@ -292,10 +292,15 @@ impl std::str::FromStr for BUFRUnit {
             "Common Code table C-1" => BUFRUnit::CC1,
             "Common Code table C-12" => BUFRUnit::CC12,
             "Common Code table C-11" => BUFRUnit::CC11,
+            "Common Code table C-14" => BUFRUnit::CC14,
             "K" => BUFRUnit::Kelvin,
+            "C" => BUFRUnit::Celsius,
             "Hz" => BUFRUnit::Hertz,
             "kg" => BUFRUnit::Kilogram,
             "m2" => BUFRUnit::SquareMeter,
+            "m3" => BUFRUnit::CubicMeter,
+            "m2 s-2" => BUFRUnit::SquareMeterPerSquareSecond,
+            "Pa" => BUFRUnit::Pascal,
             _ => unimplemented!("Unrecognized unit: {}", s),
         })
     }

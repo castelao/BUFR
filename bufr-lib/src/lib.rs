@@ -842,12 +842,17 @@ enum BUFRUnit {
     CC1,
     CC12,
     CC11,
+    CC14,
     CodeTableOriginator,
     Meter,
-    Kelvin,      // K
-    Hertz,       // Hz
-    Kilogram,    // kg
-    SquareMeter, // m^2
+    Kelvin,                     // K
+    Hertz,                      // Hz
+    Kilogram,                   // kg
+    SquareMeter,                // m^2
+    CubicMeter,                 // m^3
+    SquareMeterPerSquareSecond, // m2 s-2
+    Pascal,                     // Pa
+    Celsius,                    // C
 }
 
 /*
