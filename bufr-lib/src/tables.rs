@@ -26,6 +26,7 @@ pub(crate) static TABLE_F0: Lazy<TableF0> = Lazy::new(|| {
     let new_table = parse_table_f0(&data[..]);
     table.extend(new_table);
 
+    /*
     let data = include_bytes!("../tables/BUFRCREX_TableB_en_02.csv");
     let new_table = parse_table_f0(&data[..]);
     table.extend(new_table);
@@ -33,6 +34,7 @@ pub(crate) static TABLE_F0: Lazy<TableF0> = Lazy::new(|| {
     let data = include_bytes!("../tables/BUFRCREX_TableB_en_03.csv");
     let new_table = parse_table_f0(&data[..]);
     table.extend(new_table);
+    */
 
     let data = include_bytes!("../tables/BUFRCREX_TableB_en_04.csv");
     let new_table = parse_table_f0(&data[..]);
@@ -42,6 +44,7 @@ pub(crate) static TABLE_F0: Lazy<TableF0> = Lazy::new(|| {
     let new_table = parse_table_f0(&data[..]);
     table.extend(new_table);
 
+    /*
     let data = include_bytes!("../tables/BUFRCREX_TableB_en_06.csv");
     let new_table = parse_table_f0(&data[..]);
     table.extend(new_table);
@@ -49,11 +52,13 @@ pub(crate) static TABLE_F0: Lazy<TableF0> = Lazy::new(|| {
     let data = include_bytes!("../tables/BUFRCREX_TableB_en_07.csv");
     let new_table = parse_table_f0(&data[..]);
     table.extend(new_table);
+    */
 
     let data = include_bytes!("../tables/BUFRCREX_TableB_en_08.csv");
     let new_table = parse_table_f0(&data[..]);
     table.extend(new_table);
 
+    /*
     let data = include_bytes!("../tables/BUFRCREX_TableB_en_10.csv");
     let new_table = parse_table_f0(&data[..]);
     table.extend(new_table);
@@ -77,11 +82,13 @@ pub(crate) static TABLE_F0: Lazy<TableF0> = Lazy::new(|| {
     let data = include_bytes!("../tables/BUFRCREX_TableB_en_15.csv");
     let new_table = parse_table_f0(&data[..]);
     table.extend(new_table);
+    */
 
     let data = include_bytes!("../tables/BUFRCREX_TableB_en_19.csv");
     let new_table = parse_table_f0(&data[..]);
     table.extend(new_table);
 
+    /*
     let data = include_bytes!("../tables/BUFRCREX_TableB_en_20.csv");
     let new_table = parse_table_f0(&data[..]);
     table.extend(new_table);
@@ -93,11 +100,13 @@ pub(crate) static TABLE_F0: Lazy<TableF0> = Lazy::new(|| {
     let data = include_bytes!("../tables/BUFRCREX_TableB_en_22.csv");
     let new_table = parse_table_f0(&data[..]);
     table.extend(new_table);
+    */
 
     let data = include_bytes!("../tables/BUFRCREX_TableB_en_23.csv");
     let new_table = parse_table_f0(&data[..]);
     table.extend(new_table);
 
+    /*
     let data = include_bytes!("../tables/BUFRCREX_TableB_en_24.csv");
     let new_table = parse_table_f0(&data[..]);
     table.extend(new_table);
@@ -105,6 +114,7 @@ pub(crate) static TABLE_F0: Lazy<TableF0> = Lazy::new(|| {
     let data = include_bytes!("../tables/BUFRCREX_TableB_en_25.csv");
     let new_table = parse_table_f0(&data[..]);
     table.extend(new_table);
+    */
 
     let data = include_bytes!("../tables/BUFRCREX_TableB_en_26.csv");
     let new_table = parse_table_f0(&data[..]);
@@ -130,14 +140,17 @@ pub(crate) static TABLE_F0: Lazy<TableF0> = Lazy::new(|| {
     let new_table = parse_table_f0(&data[..]);
     table.extend(new_table);
 
+    /*
     let data = include_bytes!("../tables/BUFRCREX_TableB_en_33.csv");
     let new_table = parse_table_f0(&data[..]);
     table.extend(new_table);
+    */
 
     let data = include_bytes!("../tables/BUFRCREX_TableB_en_35.csv");
     let new_table = parse_table_f0(&data[..]);
     table.extend(new_table);
 
+    /*
     let data = include_bytes!("../tables/BUFRCREX_TableB_en_40.csv");
     let new_table = parse_table_f0(&data[..]);
     table.extend(new_table);
@@ -145,6 +158,7 @@ pub(crate) static TABLE_F0: Lazy<TableF0> = Lazy::new(|| {
     let data = include_bytes!("../tables/BUFRCREX_TableB_en_41.csv");
     let new_table = parse_table_f0(&data[..]);
     table.extend(new_table);
+    */
 
     let data = include_bytes!("../tables/BUFRCREX_TableB_en_42.csv");
     let new_table = parse_table_f0(&data[..]);
