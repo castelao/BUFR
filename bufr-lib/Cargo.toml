@@ -1,8 +1,12 @@
 [package]
 name = "bufr"
-version = "0.1.0"
-authors = ["castelao"]
+version = "0.1.1"
+authors = ["Luiz Irber <luiz.irber@gmail.com>", "Guilherme Castelão <guilherme@castelao.net>"]
 edition = "2018"
+description = "BUFR is binary data format defined by WMO focused on real-time data."
+documentation = "https://docs.rs/bufr"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/castelao/BUFR"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -13,3 +17,4 @@ thiserror = "1.0"
 getset = "0.1.1"
 serde = { version = "1.0.125", features = ["derive"] }
 byteorder = "1.4.3"
+once_cell = "1.8.0"

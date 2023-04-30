@@ -80,7 +80,7 @@ jobs:
         run: cargo tarpaulin --all-features --timeout 600 --out Xml -- --test-threads 1
 
       - name: Upload coverage to codecov
-        uses: codecov/codecov-action@v1.0.3
+        uses: codecov/codecov-action@v3
 
   lints:
     name: Lints
@@ -123,8 +123,14 @@ jobs:
           toolchain: stable
           override: true
 
-      - name: Make sure we can publish
+      - name: Make sure we can publish core library
         uses: actions-rs/cargo@v1
         with:
           command: publish
-          args: --dry-run
+          args: --dry-run -p bufr
+
+      - name: Make sure we can publish bufr-dump
+        uses: actions-rs/cargo@v1
+        with:
+          command: publish
+          args: --dry-run -p bufr-dump

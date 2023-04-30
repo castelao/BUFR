@@ -1,12 +1,16 @@
 [package]
 name = "bufr-dump"
-version = "0.1.0"
-authors = ["Guilherme Castelão <guilherme@castelao.net>"]
+version = "0.1.1"
+authors = ["Guilherme Castelão <guilherme@castelao.net>", "Luiz Irber <luiz.irber@gmail.com>"]
 edition = "2018"
+description = "Parse and show the content of a BUFR dataset. It is meant for human inspection (such as ncdump is for NetCDF)."
+documentation = "https://docs.rs/bufr"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/castelao/BUFR/tree/master/bufr-dump"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 structopt = "0.3.21"
-bufr = { path = "../bufr-lib" }
+bufr = { version = "0.1.1", path = "../bufr-lib" }
 anyhow = "1.0.38"

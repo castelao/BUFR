@@ -10,6 +10,8 @@ use std::fmt;
 use byteorder::{BigEndian, WriteBytesExt};
 use getset::{CopyGetters, Getters};
 
+use crate::tables::TABLE_F3;
+
 /// Possible errors when parsing BUFR messages
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
@@ -50,7 +52,6 @@ pub enum Error {
 }
 
 /// A parsed BUFR message
-#[derive(Debug)]
 pub struct Message {
     total_length: u32,
     version: u8,
@@ -63,11 +64,22 @@ impl fmt::Display for Message {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         writeln!(f, "BUFR version {}", self.version)?;
         writeln!(f, "     total length: {}", self.total_length)?;
-        writeln!(f, "")?;
+        writeln!(f, "\n")?;
         writeln!(f, "{}", self.section1)?;
-        writeln!(f, "")?;
+        writeln!(f, "\n")?;
+        writeln!(f, "{}", self.section3)
+    }
+}
+
+impl fmt::Debug for Message {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        writeln!(f, "BUFR version {}", self.version)?;
+        writeln!(f, "     total length: {}", self.total_length)?;
+        writeln!(f, "\n")?;
+        writeln!(f, "{}", self.section1)?;
+        writeln!(f, "\n")?;
         writeln!(f, "{}", self.section3)?;
-        writeln!(f, "")?;
+        writeln!(f, "\n")?;
         writeln!(f, "{:?}", self.section4)
     }
 }
@@ -90,8 +102,8 @@ impl fmt::Display for Section1 {
 impl Section1 {
     fn decode(buf: &[u8], version: u8) -> Result<Section1, Error> {
         Ok(match version {
-            3 => Section1::V3(Section1v3::decode(&buf[..])?),
-            4 => Section1::V4(Section1v4::decode(&buf[..])?),
+            3 => Section1::V3(Section1v3::decode(buf)?),
+            4 => Section1::V4(Section1v4::decode(buf)?),
             _ => unimplemented!(),
         })
     }
@@ -157,6 +169,7 @@ pub struct Section1v3 {
 }
 
 impl Section1v3 {
+    #[allow(unused_variables)]
     fn decode(buf: &[u8]) -> Result<Section1v3, Error> {
         unimplemented!()
     }
@@ -362,9 +375,9 @@ impl fmt::Display for Section3 {
         writeln!(f, "is compressed: {:?}", self.is_compressed())?;
 
         let mut ident = String::new();
-        ident.extend("    ".chars());
+        ident.push_str("    ");
 
-        let mut n = 0;
+        // let mut n = 0;
         let mut iter = self.descriptors.iter();
         while let Some(d) = iter.next() {
             if d.f == 1 {
@@ -372,7 +385,16 @@ impl fmt::Display for Section3 {
                     writeln!(f, "{}{:?} + {:?}", ident, d, dd)?;
                 }
                 // n = if d.y == 0 { d.x + 1 } else { d.x };
-                ident.extend("    ".chars());
+                ident.push_str("    ");
+            } else if d.f == 3 {
+                writeln!(f, "{}{:?}", ident, d)?;
+
+                let child = TABLE_F3
+                    .get(&(d.x, d.y))
+                    .expect("Failed to get item from F3 table");
+                for c in child.iter() {
+                    writeln!(f, "{} |_ {}", ident, c)?;
+                }
             } else {
                 writeln!(f, "{}{:?}", ident, d)?;
             };
@@ -387,7 +409,7 @@ impl Section3 {
             return Err(Error::MessageTooShort);
         }
         let length = (usize::from(buf[0]) << 16) + (usize::from(buf[1]) << 8) + usize::from(buf[2]);
-        if (buf.len() as usize) < length {
+        if buf.len() < length {
             return Err(Error::TruncatedMessage);
         }
         // 4th byte reserved, set to zero
@@ -506,7 +528,7 @@ impl Section4 {
             return Err(Error::MessageTooShort);
         }
         let length = (usize::from(buf[0]) << 16) + (usize::from(buf[1]) << 8) + usize::from(buf[2]);
-        if (buf.len() as usize) < length {
+        if buf.len() < length {
             return Err(Error::TruncatedMessage);
         }
         // 4th byte reserved, set to zero
@@ -750,12 +772,14 @@ struct BufferReader<'a> {
 }
 
 impl<'a> BufferReader<'a> {
+    #[allow(dead_code)]
     fn new(buffer: &'a [u8]) -> Self {
         Self {
             buffer: bitreader::BitReader::new(buffer),
         }
     }
 
+    #[allow(dead_code)]
     /// offset in bits !!!!
     fn consume(&mut self, width: usize) -> Result<Vec<u8>, Error> {
         let chunks = width / 8;
@@ -777,6 +801,7 @@ impl<'a> BufferReader<'a> {
     }
 }
 
+#[allow(dead_code)]
 fn width_value_from_table(x: u8, y: u8) -> usize {
     match (x, y) {
         (1, 27) => 80,
@@ -807,6 +832,7 @@ fn width_value_from_table(x: u8, y: u8) -> usize {
 enum BUFRUnit {
     Numeric,
     CodeTable,
+    FlagTable,
     CCITTIA5,
     Year,           // a
     Month,          // mon
@@ -820,8 +846,105 @@ enum BUFRUnit {
     CC1,
     CC12,
     CC11,
+    CC14,
     CodeTableOriginator,
     Meter,
+    Kelvin,                     // K
+    Hertz,                      // Hz
+    Kilogram,                   // kg
+    KilogramPerLiter,           // kg l-1
+    SquareMeter,                // m^2
+    CubicMeter,                 // m^3
+    CubicMeterPerSecond,        // m^3
+    SquareMeterPerSquareSecond, // m2 s-2
+    Pascal,                     // Pa
+    Celsius,                    // C
+}
+
+/*
+type FieldName = String;
+enum Values {
+    Integer(u32),
+    String(String),
+    Array(Vec<Value>),
+    Float(f64),
+    Map(HashMap<FieldName, Values>),
+}
+*/
+
+/*
+magic(0-04-001, 001001100110_0111011) -> Values
+0-04-001 = Year (scale=0, reference=0, DataWidth=12, BUFR_Unit=a)
+
+Next test cases:
+1111_0000
+1111_1111_1111_0000
+*/
+
+#[cfg(test)]
+mod test_magic {
+    use super::{tables::TABLE_F0, BufferReader};
+
+    #[test]
+    // 0-04-031: width 8, scale 0, reference 0
+    fn width8() -> Result<(), Box<dyn std::error::Error>> {
+        let descriptor = TABLE_F0.get(&(4, 31)).expect("No descriptor");
+        let buffer = [0b0000_1000];
+
+        let mut reader = BufferReader::new(&buffer);
+        let value = reader.consume(descriptor.data_width as usize)?;
+
+        //let (value, offset) = magic(descriptor, &buffer[..], 0);
+        assert_eq!(value, &[8]);
+        //assert_eq!(offset, 8);
+
+        Ok(())
+    }
+
+    #[test]
+    // 0-04-002: width 4, scale 0, reference 0
+    fn width4() -> Result<(), Box<dyn std::error::Error>> {
+        let descriptor = TABLE_F0.get(&(4, 2)).expect("No descriptor");
+        let buffer = [0b0000_1000];
+
+        let mut reader = BufferReader::new(&buffer);
+        let value = reader.consume(descriptor.data_width as usize)?;
+        assert_eq!(value, &[0]);
+
+        let value = reader.consume(descriptor.data_width as usize)?;
+        assert_eq!(value, &[8]);
+
+        Ok(())
+    }
+
+    #[test]
+    // 0-04-001: width 12, scale 0, reference 0
+    fn width12() -> Result<(), Box<dyn std::error::Error>> {
+        let descriptor = TABLE_F0.get(&(4, 1)).expect("No descriptor");
+        let buffer = [0b0000_1111, 0b0000_1111];
+
+        let mut reader = BufferReader::new(&buffer);
+        let value = reader.consume(descriptor.data_width as usize)?;
+        assert_eq!(value, &[15, 0]);
+
+        Ok(())
+    }
+
+    #[test]
+    // 0-04-004: width 5, scale 0, reference 0
+    fn width_5x2() -> Result<(), Box<dyn std::error::Error>> {
+        let descriptor = TABLE_F0.get(&(4, 4)).expect("No descriptor");
+        let buffer = [0b0000_1000, 0b0100_1111];
+        let mut reader = BufferReader::new(&buffer);
+
+        let value = reader.consume(descriptor.data_width as usize)?;
+        assert_eq!(value, &[1]);
+
+        let value = reader.consume(descriptor.data_width as usize)?;
+        assert_eq!(value, &[1]);
+
+        Ok(())
+    }
 }
 
 // scale: The power of 10 by which the element has been multiplied prior to encoding.

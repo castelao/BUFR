@@ -1,14 +1,384 @@
 use std::collections::HashMap;
+use std::convert::TryFrom;
+use std::fmt;
 use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
-use std::path::PathBuf;
+// use std::path::PathBuf;
+// use std::str::FromStr;
 
+use once_cell::sync::Lazy;
 use serde::Deserialize;
 
 use crate::ElementDescriptor;
 
-#[allow(non_snake_case)]
+pub(crate) type TableF0 = HashMap<(u8, u8), ElementDescriptor>;
+pub(crate) type TableF3 = HashMap<(u8, u8), F3>;
+
+pub(crate) static TABLE_F0: Lazy<TableF0> = Lazy::new(|| {
+    let mut table = TableF0::default();
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_00.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_01.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    /*
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_02.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_03.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+    */
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_04.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_05.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    /*
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_06.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_07.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+    */
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_08.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    /*
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_10.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_11.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_12.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_13.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_14.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_15.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+    */
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_19.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    /*
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_20.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_21.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_22.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+    */
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_23.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    /*
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_24.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_25.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+    */
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_26.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_27.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_28.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_29.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_30.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_31.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    /*
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_33.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+    */
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_35.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    /*
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_40.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_41.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+    */
+
+    let data = include_bytes!("../tables/BUFRCREX_TableB_en_42.csv");
+    let new_table = parse_table_f0(&data[..]);
+    table.extend(new_table);
+
+    table
+});
+
+pub(crate) static TABLE_F3: Lazy<TableF3> = Lazy::new(|| {
+    let mut table = TableF3::default();
+
+    // FIXME: 18, 21, 22, 40
+    //    for n in 0..16 {
+    let data = include_bytes!("../tables/BUFR_TableD_en_00.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_01.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_02.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_03.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_04.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_05.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_06.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_07.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_08.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_09.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_10.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_11.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_12.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_13.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_14.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_15.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_16.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_17.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_18.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_19.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_20.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_21.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_22.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_23.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_24.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_25.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_26.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_27.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_28.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_29.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_30.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_31.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_32.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_33.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_34.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/BUFR_TableD_en_35.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    let data = include_bytes!("../tables/glider.csv");
+    let new_table = parse_table_f3(&data[..]);
+    table.extend(new_table);
+
+    table
+});
+
+#[derive(PartialEq, Debug)]
+pub enum Descriptor {
+    Element(u8, u8),     // F0
+    Replication(u8, u8), // F1
+    Operator(u8, u8),    // F2
+    Sequence(u8, u8),    // F3
+}
+
+impl fmt::Display for Descriptor {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let (fd, x, y) = match *self {
+            Descriptor::Element(x, y) => (0, x, y),
+            Descriptor::Replication(x, y) => (1, x, y),
+            Descriptor::Operator(x, y) => (2, x, y),
+            Descriptor::Sequence(x, y) => (3, x, y),
+        };
+        write!(f, "Descriptor {{ f: {}, x: {}, y: {} }}", fd, x, y)
+    }
+}
+
+#[derive(PartialEq, Debug)]
+pub(crate) struct F3 {
+    descriptors: Vec<Descriptor>,
+    title: Option<String>,
+}
+
+impl F3 {
+    pub(crate) fn iter(&self) -> impl Iterator<Item = &Descriptor> {
+        self.descriptors.iter()
+    }
+}
+
+/*
+impl Iterator for F3 {
+    type Item = Descriptor;
+
+    fn next(&mut self) -> Option<Self::Item> {
+
+    }
+}
+*/
+
+impl TryFrom<Descriptor> for &ElementDescriptor {
+    type Error = crate::Error;
+
+    fn try_from(value: Descriptor) -> Result<Self, Self::Error> {
+        match value {
+            Descriptor::Element(x, y) => Ok(&TABLE_F0[&(x, y)]),
+            _ => unimplemented!(),
+        }
+    }
+}
+
+//Descriptor::Element()
+
+#[allow(dead_code, non_snake_case)]
 #[derive(Debug, Deserialize)]
 pub struct RecordF0 {
     ClassNo: String,      // X
@@ -26,7 +396,7 @@ pub struct RecordF0 {
     Status: String, // Operation: String
 }
 
-#[allow(non_snake_case)]
+#[allow(dead_code, non_snake_case)]
 #[derive(Debug, Deserialize, Clone)]
 pub struct RecordF3 {
     Category: String,
@@ -41,8 +411,12 @@ pub struct RecordF3 {
     Status: String,
 }
 
-pub type TableF0 = HashMap<(u8, u8), ElementDescriptor>;
-pub type TableF3 = HashMap<(u8, u8), Vec<RecordF3>>;
+impl F3 {
+    #[allow(dead_code)]
+    fn len(&self) -> usize {
+        self.descriptors.len()
+    }
+}
 
 use crate::BUFRUnit;
 
@@ -52,10 +426,12 @@ impl std::str::FromStr for BUFRUnit {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Ok(match s {
             "Code table" => BUFRUnit::CodeTable,
+            "Flag table" => BUFRUnit::FlagTable,
             "Numeric" => BUFRUnit::Numeric,
             "a" => BUFRUnit::Year,
             "d" => BUFRUnit::Day,
             "m/s" => BUFRUnit::MeterPerSecond,
+            "m s-1" => BUFRUnit::MeterPerSecond,
             "CCITT IA5" => BUFRUnit::CCITTIA5,
             "degree true" => BUFRUnit::DegreeTrue,
             "Code table defined by originating/generating centre" => BUFRUnit::CodeTableOriginator,
@@ -68,6 +444,18 @@ impl std::str::FromStr for BUFRUnit {
             "Common Code table C-1" => BUFRUnit::CC1,
             "Common Code table C-12" => BUFRUnit::CC12,
             "Common Code table C-11" => BUFRUnit::CC11,
+            "Common Code table C-14" => BUFRUnit::CC14,
+            "K" => BUFRUnit::Kelvin,
+            "C" => BUFRUnit::Celsius,
+            "Hz" => BUFRUnit::Hertz,
+            "kg" => BUFRUnit::Kilogram,
+            "kg l-1" => BUFRUnit::KilogramPerLiter,
+            "m2" => BUFRUnit::SquareMeter,
+            "m3" => BUFRUnit::CubicMeter,
+            "m3/s" => BUFRUnit::CubicMeterPerSecond,
+            "m3 s-1" => BUFRUnit::CubicMeterPerSecond,
+            "m2 s-2" => BUFRUnit::SquareMeterPerSquareSecond,
+            "Pa" => BUFRUnit::Pascal,
             _ => unimplemented!("Unrecognized unit: {}", s),
         })
     }
@@ -87,11 +475,15 @@ impl From<RecordF0> for ElementDescriptor {
     }
 }
 
-pub fn load_table_f0<P: AsRef<Path>>(filename: P) -> TableF0 {
+#[allow(dead_code)]
+fn load_table_f0<P: AsRef<Path>>(filename: P) -> TableF0 {
     let path = filename.as_ref();
-    let file = File::open(path).expect(&format!("Error loading file: {:?}", path));
+    let file = File::open(path).unwrap_or_else(|_| panic!("Error loading file: {:?}", path));
     let reader = BufReader::new(file);
+    parse_table_f0(reader)
+}
 
+fn parse_table_f0<R: std::io::Read>(reader: R) -> TableF0 {
     let mut table = TableF0::default();
 
     let mut rdr = csv::Reader::from_reader(reader);
@@ -105,11 +497,15 @@ pub fn load_table_f0<P: AsRef<Path>>(filename: P) -> TableF0 {
     table
 }
 
-pub fn load_table_f3<P: AsRef<Path>>(filename: P) -> TableF3 {
+#[allow(dead_code)]
+fn load_table_f3<P: AsRef<Path>>(filename: P) -> TableF3 {
     let path = filename.as_ref();
-    let file = File::open(path).expect(&format!("Error loading file: {:?}", path));
+    let file = File::open(path).unwrap_or_else(|_| panic!("Error loading file: {:?}", path));
     let reader = BufReader::new(file);
+    parse_table_f3(reader)
+}
 
+fn parse_table_f3<R: std::io::Read>(reader: R) -> TableF3 {
     let mut table = TableF3::default();
 
     let mut rdr = csv::Reader::from_reader(reader);
@@ -119,30 +515,48 @@ pub fn load_table_f3<P: AsRef<Path>>(filename: P) -> TableF3 {
         assert_eq!(f, 3);
         let x: u8 = record.FXY1.get(1..=2).expect("").parse().expect("");
         let y: u8 = record.FXY1.get(3..).expect("").parse().expect("");
-        //table.insert((f, x, y), record);
         table
             .entry((x, y))
-            .and_modify(|v| v.push(record.clone()))
-            .or_insert(vec![record]);
+            .and_modify(|v| {
+                // TODO:
+                // - verify that v.title is a superset of record.Title_en
+                // - only warn, not assert
+                //assert_eq!(record.Title_en, v.title);
+                v.descriptors.push(record.clone().into())
+            })
+            .or_insert({
+                let title = record.Title_en.clone();
+                F3 {
+                    descriptors: vec![record.into()],
+                    title,
+                }
+            });
     }
     table
 }
 
+impl From<RecordF3> for Descriptor {
+    fn from(record: RecordF3) -> Self {
+        let f: u8 = record.FXY2.get(0..1).expect("").parse().expect("");
+        let x: u8 = record.FXY2.get(1..=2).expect("").parse().expect("");
+        let y: u8 = record.FXY2.get(3..).expect("").parse().expect("");
+
+        match f {
+            0 => Descriptor::Element(x, y),
+            1 => Descriptor::Replication(x, y),
+            2 => Descriptor::Operator(x, y),
+            3 => Descriptor::Sequence(x, y),
+            _ => unimplemented!("Unknown f: {}", f),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use super::{load_table_f0, load_table_f3};
+    use super::{load_table_f0, load_table_f3, Descriptor, TABLE_F0, TABLE_F3};
     use crate::{BUFRUnit, ElementDescriptor, Error};
 
     use std::path::PathBuf;
-
-    #[test]
-    fn test_load_f0() {
-        let mut filename = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-        filename.push("tables/BUFRCREX_TableB_en_01.csv");
-
-        let table = load_table_f0(filename);
-        //        assert_eq!(table.get(&(1, 154)).unwrap().BUFR_DataWidth_Bits, 12u16);
-    }
 
     #[test]
     fn validate_load_f0() {
@@ -152,14 +566,22 @@ mod tests {
         let table = load_table_f0(filename);
         for ((x, y), v) in table.into_iter() {
             if let Ok(ans) = element_descriptor_f0(x, y) {
-                //                assert_eq!(v.BUFR_DataWidth_Bits, ans.data_width);
                 assert_eq!(v, ans);
             }
         }
     }
 
     #[test]
-    fn test_load_f3() {
+    fn validate_static_f0() {
+        for ((x, y), v) in TABLE_F0.iter() {
+            if let Ok(ans) = element_descriptor_f0(*x, *y) {
+                assert_eq!(v, &ans);
+            }
+        }
+    }
+
+    #[test]
+    fn validate_load_f3() {
         let mut filename = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
         filename.push("tables/BUFR_TableD_en_01.csv");
 
@@ -167,14 +589,25 @@ mod tests {
         let record = table.get(&(1, 2)).unwrap();
         assert_eq!(record.len(), 3);
         assert_eq!(
-            record
-                .into_iter()
-                .map(|r| r.FXY2.clone())
-                .collect::<Vec<_>>(),
+            record.descriptors,
             vec![
-                String::from("001003"),
-                String::from("001004"),
-                String::from("001005")
+                Descriptor::Element(1, 3),
+                Descriptor::Element(1, 4),
+                Descriptor::Element(1, 5),
+            ]
+        );
+    }
+
+    #[test]
+    fn validate_static_f3() {
+        let record = TABLE_F3.get(&(1, 2)).unwrap();
+        assert_eq!(record.len(), 3);
+        assert_eq!(
+            record.descriptors,
+            vec![
+                Descriptor::Element(1, 3),
+                Descriptor::Element(1, 4),
+                Descriptor::Element(1, 5),
             ]
         );
     }

@@ -1,0 +1,95 @@
+Category,CategoryOfSequences_en,FXY1,Title_en,SubTitle_en,FXY2,ElementName_en,ElementDescription_en,Note_en,Status
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,301150,WIGOS identifier,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,001087,WMO marine observing platform extended identifier,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,001019,Long station or site name,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,001036,Agency in charge of operating the observing platform,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,002148,Data collection and/or location system,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,001085,Observing platform manufacturer's model,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,001086,Observing platform manufacturer's serial number,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),Time/date of last known position,008021,Time significance,#ERROR!,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,301011,"Year, month, day",,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,301013,"Hour, minute, second",,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,301021,Latitude/longitude (high accuracy),,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,011104,"True heading of aircraft, ship or other mobile platform",,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,012169,Anemometer type,"Set to 2, wind observation through ambient noise (WOTAN)",,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,011002,Wind speed,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,011001,Wind direction,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,002169,Anemometer type,Set to missing / cancel previous value,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,022032,Speed of sea-surface current,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,022005,Direction of sea-surface current,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),Time/date of last known position,008021,Time significance,#ERROR!,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,004025,Time period or displacement,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,301011,"Year, month, day",,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,301013,"Hour, minute, second",,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,301021,Latitude/longitude (high accuracy),,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,022031,Speed of current,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,022004,Direction of current,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),Time/date of last known position,008021,Time significance,#ERROR!,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,001079,Unique identifier for the profile,Hexadecimal string,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,031001,Delayed descriptor replication factor,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,022056,Direction of profile,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,031002,Extended delayed descriptor replication factor,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,301011,"Year, month, day",,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,301021,Latitude/longitude (high accuracy),,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,008080,Qualifier for GTSPP quality flag,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,033050,Global GTSPP quality flag,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,008080,Qualifier for GTSPP quality flag,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,033050,Global GTSPP quality flag,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,008080,Qualifier for GTSPP quality flag,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,033050,Global GTSPP quality flag,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,022045,Sea/water temperature,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,008080,Qualifier for GTSPP quality flag,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,033050,Global GTSPP quality flag,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,008080,Qualifier for GTSPP quality flag,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,033050,Global GTSPP quality flag,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,022064,Salinity,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,008080,Qualifier for GTSPP quality flag,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,033050,Global GTSPP quality flag,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,008080,Qualifier for GTSPP quality flag,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,033050,Global GTSPP quality flag,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,031001,Delayed descriptor replication factor,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,022056,Direction of profile,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,031002,Extended delayed descriptor replication factor,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,301011,"Year, month, day",,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,301021,Latitude/longitude (high accuracy),,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,008080,Qualifier for GTSPP quality flag,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,033050,Global GTSPP quality flag,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,008080,Qualifier for GTSPP quality flag,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,033050,Global GTSPP quality flag,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,008080,Qualifier for GTSPP quality flag,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,033050,Global GTSPP quality flag,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,031001,Delayed descriptor replication factor,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,022056,Direction of profile,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,031002,Extended delayed descriptor replication factor,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,301011,"Year, month, day",,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,301021,Latitude/longitude (high accuracy),,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,008080,Qualifier for GTSPP quality flag,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,033050,Global GTSPP quality flag,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,022188,Dissolved oxygen,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,201000,Change scale,Cancel,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,008080,Qualifier for GTSPP quality flag,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,033050,Global GTSPP quality flag,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,031001,Delayed descriptor replication factor,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,022056,Direction of profile,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,031002,Extended delayed descriptor replication factor,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,301011,"Year, month, day",,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,301021,Latitude/longitude (high accuracy),,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,008080,Qualifier for GTSPP quality flag,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,033050,Global GTSPP quality flag,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,008080,Qualifier for GTSPP quality flag,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,033050,Global GTSPP quality flag,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),Dissolved oxygen profile data,104000,Delayed replication of 4 descriptors,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,031001,Delayed descriptor replication factor,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,112000,Delayed replication of 12 descriptors,,,
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,031002,Extended delayed descriptor replication factor,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,301011,"Year, month, day",,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,301021,Latitude/longitude (high accuracy),,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,008080,Qualifier for GTSPP quality flag,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,033050,Global GTSPP quality flag,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,201135,Add 7 bits to width,,,
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,202131,Add 3 to scale,,,
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,013080,Water PH,,,
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,202000,Cancel change scale,Cancel,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,201000,Cancel change width,Cancel,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,008080,Qualifier for GTSPP quality flag,,,Operational
+15,Oceanographic report sequences,315012,(Ocean glider trajectory profile sequence),,033050,Global GTSPP quality flag,,,Operational
