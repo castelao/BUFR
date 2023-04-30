@@ -1,6 +1,6 @@
 [package]
 name = "bufr"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Luiz Irber <luiz.irber@gmail.com>", "Guilherme Castelão <guilherme@castelao.net>"]
 edition = "2018"
 

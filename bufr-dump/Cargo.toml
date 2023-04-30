@@ -1,6 +1,6 @@
 [package]
 name = "bufr-dump"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Guilherme Castelão <guilherme@castelao.net>", "Luiz Irber <luiz.irber@gmail.com>"]
 edition = "2018"
 
@@ -8,5 +8,5 @@ edition = "2018"
 
 [dependencies]
 structopt = "0.3.21"
-bufr = { path = "../bufr-lib" }
+bufr = { version = "0.1.1", path = "../bufr-lib" }
 anyhow = "1.0.38"
