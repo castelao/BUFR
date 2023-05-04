@@ -450,6 +450,7 @@ impl std::str::FromStr for BUFRUnit {
             "Hz" => BUFRUnit::Hertz,
             "kg" => BUFRUnit::Kilogram,
             "kg l-1" => BUFRUnit::KilogramPerLiter,
+            "kg m-3" => BUFRUnit::KilogramPerCubicMeter,
             "m2" => BUFRUnit::SquareMeter,
             "m3" => BUFRUnit::CubicMeter,
             "m3/s" => BUFRUnit::CubicMeterPerSecond,

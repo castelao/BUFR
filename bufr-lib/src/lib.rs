@@ -853,6 +853,7 @@ enum BUFRUnit {
     Hertz,                      // Hz
     Kilogram,                   // kg
     KilogramPerLiter,           // kg l-1
+    KilogramPerCubicMeter,      // kg m-3
     SquareMeter,                // m^2
     CubicMeter,                 // m^3
     CubicMeterPerSecond,        // m^3
