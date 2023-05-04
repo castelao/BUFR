@@ -1,5 +1,7 @@
 //#![deny(missing_docs)]
 
+//! BUFR binary data format
+//!
 //! Module level docs
 
 mod tables;
