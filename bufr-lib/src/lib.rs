@@ -320,7 +320,7 @@ impl Section1v4 {
 
 impl fmt::Display for Section1v4 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        writeln!(f, "Section 1 (v4)");
+        writeln!(f, "Section 1 (v4)")?;
         writeln!(f, "    Section length: {}", self.length())?;
         writeln!(
             f,
