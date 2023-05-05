@@ -1,5 +1,7 @@
 //#![deny(missing_docs)]
 
+//! BUFR binary data format
+//!
 //! Module level docs
 
 mod tables;
@@ -95,7 +97,10 @@ pub enum Section1 {
 
 impl fmt::Display for Section1 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        writeln!(f, "{:?}", self)
+        match self {
+            Section1::V3(_) => writeln!(f, "{:?}", self),
+            Section1::V4(s) => writeln!(f, "{}", s),
+        }
     }
 }
 
@@ -312,6 +317,38 @@ impl Section1v4 {
     /// Length of the Section 1
     pub fn length(&self) -> usize {
         self.length
+    }
+}
+
+impl fmt::Display for Section1v4 {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        writeln!(f, "Section 1 (v4)")?;
+        writeln!(f, "    Section length: {}", self.length())?;
+        writeln!(
+            f,
+            "    Master table: {} (version: {})",
+            self.master_table(),
+            self.master_table_version()
+        )?;
+        writeln!(f, "    Sub-center: {}", self.sub_center())?;
+        writeln!(f, "    Center: {}", self.center())?;
+        writeln!(f, "    Update version: {}", self.update_version())?;
+        writeln!(f, "    Optional section: {}", self.optional_section())?;
+        writeln!(f, "    Data category: {}", self.data_category())?;
+        writeln!(f, "    Data sub-category: {}", self.data_subcategory())?;
+        writeln!(f, "    Local sub-category: {}", self.local_subcategory())?;
+        writeln!(f, "    Local table version: {}", self.local_table_version())?;
+        writeln!(
+            f,
+            "    Time: {}-{}-{}T{}:{}:{}",
+            self.year(),
+            self.month(),
+            self.day(),
+            self.hour(),
+            self.minute(),
+            self.second()
+        )?;
+        writeln!(f, "    Local use: {:x?}", self.local_use())
     }
 }
 
