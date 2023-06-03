@@ -13,6 +13,7 @@ repository = "https://github.com/castelao/BUFR"
 [dependencies]
 bitreader="0.3"
 csv="1.1"
+derive_builder = "0.12.0"
 thiserror = "1.0"
 getset = "0.1.1"
 serde = { version = "1.0.125", features = ["derive"] }
