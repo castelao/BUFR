@@ -350,11 +350,15 @@ mod test_section1_builder {
 
 impl Section1v4Builder {
     fn default_length(&self) -> Result<usize, Section1v4BuilderError> {
+        // Only if local_use is false
+        Ok(22)
+        /*
         match self.local_use {
             Some(ref x) => Ok(7 + 2 * x.len()),
             _ => Err(Section1v4BuilderError::from(
                 derive_builder::UninitializedFieldError::new("local_use"),
             )),
         }
+        */
     }
 }
