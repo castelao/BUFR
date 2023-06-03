@@ -10,6 +10,7 @@ use std::convert::TryInto;
 use std::fmt;
 
 use byteorder::{BigEndian, WriteBytesExt};
+use derive_builder::Builder;
 use getset::{CopyGetters, Getters};
 
 use crate::tables::TABLE_F3;
@@ -394,12 +395,15 @@ mod test_section1 {
 }
 
 /// Data description Section (section 3) of the BUFR format
-#[derive(Debug)]
+#[derive(Builder, Debug)]
 pub struct Section3 {
+    #[builder(setter(skip = true), default = "self.default_length()?")]
     length: usize,
     // 4th byte is reserved
+    #[builder(default = "1")]
     n_subsets: u16,
     is_observed: bool,
+    #[builder(default = "false")]
     is_compressed: bool,
     descriptors: Vec<Descriptor>,
 }
@@ -542,6 +546,33 @@ mod test_section3 {
         section.encode(&mut buf)?;
 
         Ok(())
+    }
+}
+
+impl Section3Builder {
+    fn default_length(&self) -> Result<usize, Section3BuilderError> {
+        match self.descriptors {
+            Some(ref x) => Ok(7 + 2 * x.len()),
+            _ => Err(Section3BuilderError::from(
+                derive_builder::UninitializedFieldError::new("descriptors"),
+            )),
+        }
+    }
+}
+
+#[cfg(test)]
+mod test_section3_builder {
+    use super::{Descriptor, Section3Builder};
+
+    #[test]
+    fn build() {
+        let section = Section3Builder::default()
+            .is_observed(true)
+            .descriptors(vec![Descriptor { f: 3, x: 15, y: 12 }])
+            .build()
+            .unwrap();
+
+        assert_eq!(section.length(), 9);
     }
 }
 
