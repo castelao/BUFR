@@ -13,7 +13,6 @@ use std::fmt;
 
 use byteorder::{BigEndian, WriteBytesExt};
 use derive_builder::Builder;
-use getset::{CopyGetters, Getters};
 
 pub use crate::error::Error;
 pub use crate::identification::Section1;
