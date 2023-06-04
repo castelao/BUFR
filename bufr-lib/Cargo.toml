@@ -1,6 +1,6 @@
 [package]
 name = "bufr"
-version = "0.1.2"
+version.workspace = true
 authors = ["Luiz Irber <luiz.irber@gmail.com>", "Guilherme Castelão <guilherme@castelao.net>"]
 edition = "2018"
 description = "BUFR is binary data format defined by WMO focused on real-time data."
